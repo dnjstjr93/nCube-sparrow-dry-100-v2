@@ -1399,6 +1399,8 @@ var debug_mode_state = 'start';
 setTimeout(core_watchdog, 2000);
 
 setTimeout(mon_input_door, 250);
+setTimeout(mon_output_door, 250);
+setTimeout(mon_safe_door, 250);
 
 var input_door_once = 0;
 function mon_input_door() {
@@ -1417,12 +1419,46 @@ function mon_input_door() {
 
 }
 
+var output_door_once = 0;
+function mon_output_door() {
+    if (dry_data_block.output_door == DOOR_CLOSE){
+        if (input_door_once == 0) {
+            dryer_event |= EVENT_OUTPUT_DOOR_CLOSE;
+            input_door_once = 1;
+        }
+        setTimeout(mon_output_door, 250);
+    }
+    else if (dry_data_block.output_door == DOOR_OPEN){
+        output_door_once = 0;
+        dryer_event |= EVENT_OUTPUT_DOOR_OPEN;
+        setTimeout(mon_output_door, 5000);
+    }
+
+}
+
+var safe_door_once = 0;
+function mon_safe_door() {
+    if (dry_data_block.safe_door == DOOR_CLOSE){
+        if (safe_door_once == 0) {
+            dryer_event |= EVENT_SAFE_DOOR_CLOSE;
+            safe_door_once = 1;
+        }
+        setTimeout(mon_safe_door, 250);
+    }
+    else if (dry_data_block.input_door == DOOR_OPEN){
+        safe_door_once = 0;
+        dryer_event |= EVENT_SAFE_DOOR_OPEN;
+        setTimeout(mon_safe_door, 5000);
+    }
+
+}
+
 setTimeout(dryer_event_handler, 100);
 
 function dryer_event_handler(){
     if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
         dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
-        if (dry_data_block.status != 'DEBUG'){
+        if (dry_data_block.state != 'DEBUG'){
             console.log("dryer event handler door open");
             dry_data_block.debug_message = 'Close input door';
             set_buzzer();
@@ -1432,12 +1468,49 @@ function dryer_event_handler(){
     }
     else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
         dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-        if (dry_data_block.status != 'DEBUG'){
+        if (dry_data_block.state != 'DEBUG'){
             dry_data_block.debug_message = '                ';
         }
-        
     }
-    
+
+    if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        if (dry_data_block.state != 'DEBUG'){
+            dry_data_block.debug_message = 'Close output door';
+            set_buzzer();
+            set_stirrer(TURN_OFF);
+            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        }
+        else if (dry_data_block.state == 'DEBUG'){
+            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+            set_stirrer(TURN_ON);
+        }
+        else if (dry_data_block.state == 'EXHAUST') {
+            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+            set_stirrer(TURN_ON);
+        }
+    }
+    else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        if (dry_data_block.state != 'DEBUG'){
+            dry_data_block.debug_message = '                ';
+        }
+    }
+
+    if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        if (dry_data_block.state != 'DEBUG'){
+            dry_data_block.debug_message = 'Close safe door';
+            set_buzzer();
+        }
+    }
+    else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        if (dry_data_block.state != 'DEBUG'){
+            dry_data_block.debug_message = '                ';
+        }
+    }
+
     setTimeout(dryer_event_handler, 100);
 }
 
@@ -1743,38 +1816,38 @@ function core_watchdog() {
 
             dry_data_block.cum_weight = 0;
         }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-
-            console.log('EVENT_OUTPUT_DOOR_OPEN');
-
-            dry_data_block.debug_message = 'Close output door';
-            pre_debug_message = '';
-            set_buzzer();
-
-            set_stirrer(TURN_ON);
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-
-            set_stirrer(TURN_OFF);
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Close safe door';
-            pre_debug_message = '';
-            set_buzzer();
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //
+        //     console.log('EVENT_OUTPUT_DOOR_OPEN');
+        //
+        //     dry_data_block.debug_message = 'Close output door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        //
+        //     set_stirrer(TURN_ON);
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        //
+        //     set_stirrer(TURN_OFF);
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Close safe door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
         else {
             pre_cur_weight = dry_data_block.cur_weight;
 
