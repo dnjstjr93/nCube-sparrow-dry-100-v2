@@ -1,8 +1,8 @@
   
 #!/usr/bin/sh
 
-sudo chmod 777 /home/pi/nCube-sparrow-dry-100/
-cd /home/pi/nCube-sparrow-dry-100
+sudo chmod 777 /home/pi/nCube-sparrow-dry-100-v2/
+cd /home/pi/nCube-sparrow-dry-100-v2
 sudo chmod 777 *
 python3 start.py
 git stash
