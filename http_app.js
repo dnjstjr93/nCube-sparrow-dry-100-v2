@@ -1450,8 +1450,30 @@ function mon_safe_door() {
         dryer_event |= EVENT_SAFE_DOOR_OPEN;
         setTimeout(mon_safe_door, 5000);
     }
-
 }
+
+setTimeout(dryer_heat_event, 1000);
+
+function dryer_heat_event() { // event 값 선
+    if (dry_data_block.state == 'HEAT'){
+        dry_data_block.elapsed_time++;
+
+        if (cur_weight <= parseFloat(dry_data_block.tar_weight3) || dry_data_block.elapsed_time > (5*60*60)) {
+            dryer_event |= EVENT_HEAT_COMPLETE;
+        }
+    }
+    else if (dry_data_block.state == 'TARGETING'){
+        dry_data_block.elapsed_time = 0;
+    }
+    else if (dry_data_block.state == 'EXHAUST'){
+        if (dry_data_block.cur_weight < 0.5){
+            dryer_event |= EVENT_EXHAUST_COMPLETE;
+        }
+    }
+    setTimeout(dryer_heat_event, 1000);
+}
+
+
 
 setTimeout(dryer_event_handler, 100);
 
@@ -1511,8 +1533,38 @@ function dryer_event_handler(){
         }
     }
 
+    if(dryer_event & EVENT_HEAT_COMPLETE) {
+        dryer_event &= ~EVENT_HEAT_COMPLETE;
+        if (dry_data_block.state != 'HEAT'){
+            dry_data_block.debug_message = 'Complete HEAT';
+            set_buzzer();
+            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+            set_stirrer(TURN_OFF);
+            dry_data_block.state = 'END';
+        }
+        dryer_event |= EVENT_END_ACTION;
+    }
+
+    if(dryer_event & EVENT_EXHAUST_COMPLETE) {
+        dryer_event &= ~EVENT_EXHAUST_COMPLETE;
+        if (dry_data_block.state != 'EXHAUST'){
+            dry_data_block.state = 'INPUT';
+            pre_state = '';
+            print_lcd_state();
+            dry_data_block.debug_message = 'Initialize';
+        }
+    }
+
+    if(dryer_event & EVENT_START_BUTTON) {}
+
+    if(dryer_event & EVENT_LIFT_ACTION) {}
+
+    if(dryer_event & EVENT_END_ACTION) {}
+
+
     setTimeout(dryer_event_handler, 100);
 }
+
 
 var input_door_delay_count = 0;
 var output_door_delay_count = 0;
@@ -1915,44 +1967,44 @@ function core_watchdog() {
 
         }
 
-        if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-
-            console.log('EVENT_OUTPUT_DOOR_OPEN');
-
-            dry_data_block.debug_message = 'Close output door';
-            pre_debug_message = '';
-            set_buzzer();
-
-            set_stirrer(TURN_ON);
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-
-            set_stirrer(TURN_OFF);
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Close safe door';
-            pre_debug_message = '';
-            set_buzzer();
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
+        // if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //
+        //     console.log('EVENT_OUTPUT_DOOR_OPEN');
+        //
+        //     dry_data_block.debug_message = 'Close output door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        //
+        //     set_stirrer(TURN_ON);
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        //
+        //     set_stirrer(TURN_OFF);
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Close safe door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
         else {
             if (dry_data_block.debug_mode == 1) {
                 debug_mode_state = 'start';
@@ -1991,71 +2043,71 @@ function core_watchdog() {
             set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
             set_stirrer(TURN_OFF);
         }
-        else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Exception';
-            pre_debug_message = '';
-
-            dry_data_block.state = 'EXCEPTION';
-            pre_state = '';
-            print_lcd_state();
-
-            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_OFF);
-
-            set_buzzer();
-
-            exception_delay_count = 0;
-            contents_delay_count = 0;
-        }
-        else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Exception';
-            pre_debug_message = '';
-
-            dry_data_block.state = 'EXCEPTION';
-            pre_state = '';
-            print_lcd_state();
-
-            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_OFF);
-
-            set_buzzer();
-
-            exception_delay_count = 0;
-            contents_delay_count = 0;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Exception';
-            pre_debug_message = '';
-
-            dry_data_block.state = 'EXCEPTION';
-            pre_state = '';
-            print_lcd_state();
-
-            core_delay_count = 0;
-
-            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_OFF);
-
-            set_buzzer();
-
-            exception_delay_count = 0;
-            contents_delay_count = 0;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-        }
+        // else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Exception';
+        //     pre_debug_message = '';
+        //
+        //     dry_data_block.state = 'EXCEPTION';
+        //     pre_state = '';
+        //     print_lcd_state();
+        //
+        //     set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //     set_stirrer(TURN_OFF);
+        //
+        //     set_buzzer();
+        //
+        //     exception_delay_count = 0;
+        //     contents_delay_count = 0;
+        // }
+        // else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Exception';
+        //     pre_debug_message = '';
+        //
+        //     dry_data_block.state = 'EXCEPTION';
+        //     pre_state = '';
+        //     print_lcd_state();
+        //
+        //     set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //     set_stirrer(TURN_OFF);
+        //
+        //     set_buzzer();
+        //
+        //     exception_delay_count = 0;
+        //     contents_delay_count = 0;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Exception';
+        //     pre_debug_message = '';
+        //
+        //     dry_data_block.state = 'EXCEPTION';
+        //     pre_state = '';
+        //     print_lcd_state();
+        //
+        //     core_delay_count = 0;
+        //
+        //     set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //     set_stirrer(TURN_OFF);
+        //
+        //     set_buzzer();
+        //
+        //     exception_delay_count = 0;
+        //     contents_delay_count = 0;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        // }
         else {
             if(parseFloat(dry_data_block.external_temp) < 280.0 && parseFloat(dry_data_block.internal_temp) < 80.0) {
                 set_heater(TURN_ON, TURN_ON, TURN_ON);
@@ -2131,28 +2183,28 @@ function core_watchdog() {
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
         }
-        else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-
-            set_stirrer(TURN_ON);
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-
-            set_stirrer(TURN_OFF);
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-        }
+        // else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //
+        //     set_stirrer(TURN_ON);
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        //
+        //     set_stirrer(TURN_OFF);
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        // }
         else {
             if (dry_data_block.cum_weight < 2900) {
                 set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
@@ -2219,24 +2271,24 @@ function core_watchdog() {
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
         }
-        else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-        }
+        // else if(dryer_event & EVENT_INPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        // }
         else {
             if (dry_data_block.debug_mode == 0) {
                 set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
@@ -2311,38 +2363,38 @@ function core_watchdog() {
             pre_debug_message = '';
             set_buzzer();
         }
-        else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Close output door';
-            pre_debug_message = '';
-            set_buzzer();
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-
-            dry_data_block.debug_message = 'Close safe door';
-            pre_debug_message = '';
-            set_buzzer();
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
+        // else if(dryer_event & EVENT_INPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_INPUT_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Close output door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        //
+        //     dry_data_block.debug_message = 'Close safe door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        //
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
         else {
             if (dry_data_block.operation_mode == 1) {
                 if(input_mode_delay_count == 0) {
