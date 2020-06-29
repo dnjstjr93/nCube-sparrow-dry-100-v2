@@ -1747,258 +1747,258 @@ function core_watchdog() {
     //console.log(dry_data_block.debug_mode);
     //console.log(dry_data_block.state);
     if(dry_data_block.state == 'INPUT') {
-        pre_input_door = -1;
-        pre_output_door = -1;
-        pre_safe_door = -1;
-
-        if(core_delay_count == 0) {
-            set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_OFF);
-            set_lift(TURN_BACK);
-            set_crusher(TURN_OFF);
-            set_cleaning_pump(TURN_OFF);
-        }
-
-        core_delay_count++;
-        if(core_delay_count > 10) {
-            core_delay_count = 0;
-        }
-
-        if(dryer_event & EVENT_START_BUTTON) {
-            dryer_event &= ~EVENT_START_BUTTON;
-        }
-        else if(dryer_event & EVENT_START_BTN_LONG) {
-            dryer_event &= ~EVENT_START_BTN_LONG;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
-            dry_data_block.debug_message = 'Close output door';
-            pre_debug_message = '';
-            set_buzzer();
-            output_door_delay_count = 1;
-        }
-        else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-            dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-            dry_data_block.debug_message = 'Close safe door';
-            pre_debug_message = '';
-            set_buzzer();
-            safe_door_delay_count = 1;
-        }
-        else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-            dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-            dry_data_block.debug_message = ' ';
-            pre_debug_message = '';
-        }
-        else {
-            if (dry_data_block.safe_door == 0) {
-                safe_door_delay_count = 0;
-                if (dry_data_block.output_door == 0) {
-                    output_door_delay_count = 0;
-
-                    contents_delay_count = 0;
-                    sh_adn.rtvct(zero_mission_name+'/la', 0, function (rsc, res_body, count) {
-                        if (rsc == 2000) {
-                            var zero_obj = res_body[Object.keys(res_body)[0]].con;
-
-                            dry_data_block.loadcell_factor = zero_obj.loadcell_factor;
-                            dry_data_block.correlation_value = zero_obj.correlation_value;
-
-                            if(dry_mqtt_client != null) {
-                                var msg_obj = {};
-                                msg_obj.val = dry_data_block.loadcell_factor;
-                                msg_obj.val2 = dry_data_block.correlation_value;
-                                dry_mqtt_client.publish('/set_zero_point', JSON.stringify(msg_obj));
-                            }
-                        }
-                    });
-
-                    dry_data_block.debug_message = ' ';
-                    pre_debug_message = '';
-
-                    dry_data_block.cur_weight = 0.0;
-                    dry_data_block.ref_weight = 0.0;
-                    dry_data_block.pre_weight = 0.0;
-                    dry_data_block.tar_weight1 = 0.0;
-                    dry_data_block.tar_weight2 = 0.0;
-                    dry_data_block.tar_weight3 = 0.0;
-
-                    dry_data_block.state = 'INPUT';
-                    pre_state = '';
-                    print_lcd_state();
-
-                    dry_data_block.elapsed_time = 0;
-                    core_delay_count = 0;
-
-                    if (dry_data_block.cum_weight > dry_data_block.cum_ref_weight) {
-                        dry_data_block.debug_message = 'Replace the catalyst';
-                        pre_debug_message = '';
-                        set_buzzer();
-                    }
-
-                    pre_cur_weight = dry_data_block.cur_weight;
-                }
-                else {
-                    if(output_door_delay_count == 0) {
-                        dry_data_block.debug_message = 'Close output door';
-                        pre_debug_message = '';
-                        set_buzzer();
-                    }
-
-                    output_door_delay_count++;
-                    if(output_door_delay_count > 40) {
-                        output_door_delay_count = 0;
-                    }
-                }
-            }
-            else {
-                if(safe_door_delay_count == 0) {
-                    dry_data_block.debug_message = 'Close safe door';
-                    pre_debug_message = '';
-                    set_buzzer();
-                }
-
-                safe_door_delay_count++;
-                if(safe_door_delay_count > 40) {
-                    safe_door_delay_count = 0;
-                }
-            }
-        }
+        // pre_input_door = -1;
+        // pre_output_door = -1;
+        // pre_safe_door = -1;
+        //
+        // if(core_delay_count == 0) {
+        //     set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //     set_stirrer(TURN_OFF);
+        //     set_lift(TURN_BACK);
+        //     set_crusher(TURN_OFF);
+        //     set_cleaning_pump(TURN_OFF);
+        // }
+        //
+        // core_delay_count++;
+        // if(core_delay_count > 10) {
+        //     core_delay_count = 0;
+        // }
+        //
+        // if(dryer_event & EVENT_START_BUTTON) {
+        //     dryer_event &= ~EVENT_START_BUTTON;
+        // }
+        // else if(dryer_event & EVENT_START_BTN_LONG) {
+        //     dryer_event &= ~EVENT_START_BTN_LONG;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        //     dry_data_block.debug_message = 'Close output door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        //     output_door_delay_count = 1;
+        // }
+        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        //     dry_data_block.debug_message = 'Close safe door';
+        //     pre_debug_message = '';
+        //     set_buzzer();
+        //     safe_door_delay_count = 1;
+        // }
+        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        //     dry_data_block.debug_message = ' ';
+        //     pre_debug_message = '';
+        // }
+        // else {
+        //     if (dry_data_block.safe_door == 0) {
+        //         safe_door_delay_count = 0;
+        //         if (dry_data_block.output_door == 0) {
+        //             output_door_delay_count = 0;
+        //
+        //             contents_delay_count = 0;
+        //             sh_adn.rtvct(zero_mission_name+'/la', 0, function (rsc, res_body, count) {
+        //                 if (rsc == 2000) {
+        //                     var zero_obj = res_body[Object.keys(res_body)[0]].con;
+        //
+        //                     dry_data_block.loadcell_factor = zero_obj.loadcell_factor;
+        //                     dry_data_block.correlation_value = zero_obj.correlation_value;
+        //
+        //                     if(dry_mqtt_client != null) {
+        //                         var msg_obj = {};
+        //                         msg_obj.val = dry_data_block.loadcell_factor;
+        //                         msg_obj.val2 = dry_data_block.correlation_value;
+        //                         dry_mqtt_client.publish('/set_zero_point', JSON.stringify(msg_obj));
+        //                     }
+        //                 }
+        //             });
+        //
+        //             dry_data_block.debug_message = ' ';
+        //             pre_debug_message = '';
+        //
+        //             dry_data_block.cur_weight = 0.0;
+        //             dry_data_block.ref_weight = 0.0;
+        //             dry_data_block.pre_weight = 0.0;
+        //             dry_data_block.tar_weight1 = 0.0;
+        //             dry_data_block.tar_weight2 = 0.0;
+        //             dry_data_block.tar_weight3 = 0.0;
+        //
+        //             dry_data_block.state = 'INPUT';
+        //             pre_state = '';
+        //             print_lcd_state();
+        //
+        //             dry_data_block.elapsed_time = 0;
+        //             core_delay_count = 0;
+        //
+        //             if (dry_data_block.cum_weight > dry_data_block.cum_ref_weight) {
+        //                 dry_data_block.debug_message = 'Replace the catalyst';
+        //                 pre_debug_message = '';
+        //                 set_buzzer();
+        //             }
+        //
+        //             pre_cur_weight = dry_data_block.cur_weight;
+        //         }
+        //         else {
+        //             if(output_door_delay_count == 0) {
+        //                 dry_data_block.debug_message = 'Close output door';
+        //                 pre_debug_message = '';
+        //                 set_buzzer();
+        //             }
+        //
+        //             output_door_delay_count++;
+        //             if(output_door_delay_count > 40) {
+        //                 output_door_delay_count = 0;
+        //             }
+        //         }
+        //     }
+        //     else {
+        //         if(safe_door_delay_count == 0) {
+        //             dry_data_block.debug_message = 'Close safe door';
+        //             pre_debug_message = '';
+        //             set_buzzer();
+        //         }
+        //
+        //         safe_door_delay_count++;
+        //         if(safe_door_delay_count > 40) {
+        //             safe_door_delay_count = 0;
+        //         }
+        //     }
+        // }
 
         setTimeout(core_watchdog, normal_interval);
     }
 
     else if(dry_data_block.state == 'INPUT') {
-        if(dryer_event & EVENT_START_BUTTON) {
-            dryer_event &= ~EVENT_START_BUTTON;
-
-            if (dry_data_block.safe_door == 0) {
-                if (dry_data_block.output_door == 0) {
-                    if (dry_data_block.input_door == 0) {
-                        set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-                        set_stirrer(TURN_ON);
-                        set_lift(TURN_BACK);
-                        set_crusher(TURN_OFF);
-                        set_cleaning_pump(TURN_OFF);
-
-                        console.log(dry_data_block.state);
-                        dry_data_block.state = 'TARGETING';
-                        pre_state = '';
-                        print_lcd_state();
-                        console.log('->' + dry_data_block.state);
-
-                        core_delay_count = 0;
-
-                        lift_seq = 0;
-                        crusher_seq = 0;
-                        lifting();
-                        crusher();
-
-                        targeting_tick_count = 0;
-
-                        dry_data_block.pre_weight = dry_data_block.cur_weight;
-                    }
-                    else {
-                        if(input_door_delay_count == 0) {
-                            dry_data_block.debug_message = 'Close input door';
-                            pre_debug_message = '';
-                            set_buzzer();
-                        }
-
-                        input_door_delay_count++;
-                        if(input_door_delay_count > 40) {
-                            input_door_delay_count = 0;
-                        }
-                    }
-                }
-                else {
-                    if(output_door_delay_count == 0) {
-                        dry_data_block.debug_message = 'Close output door';
-                        pre_debug_message = '';
-                        set_buzzer();
-                    }
-
-                    output_door_delay_count++;
-                    if(output_door_delay_count > 40) {
-                        output_door_delay_count = 0;
-                    }
-                }
-            }
-            else {
-                if(safe_door_delay_count == 0) {
-                    dry_data_block.debug_message = 'Close safe door';
-                    pre_debug_message = '';
-                    set_buzzer();
-                }
-
-                safe_door_delay_count++;
-                if(safe_door_delay_count > 40) {
-                    safe_door_delay_count = 0;
-                }
-            }
-        }
-        else if(dryer_event & EVENT_START_BTN_LONG) {
-            dryer_event &= ~EVENT_START_BTN_LONG;
-
-            dry_data_block.debug_message = 'Reset the catalyst';
-            pre_debug_message = '';
-            set_buzzer();
-
-            dry_data_block.cum_weight = 0;
-        }
-        // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
-        //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        // if(dryer_event & EVENT_START_BUTTON) {
+        //     dryer_event &= ~EVENT_START_BUTTON;
         //
-        //     console.log('EVENT_OUTPUT_DOOR_OPEN');
+        //     if (dry_data_block.safe_door == 0) {
+        //         if (dry_data_block.output_door == 0) {
+        //             if (dry_data_block.input_door == 0) {
+        //                 set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //                 set_stirrer(TURN_ON);
+        //                 set_lift(TURN_BACK);
+        //                 set_crusher(TURN_OFF);
+        //                 set_cleaning_pump(TURN_OFF);
         //
-        //     dry_data_block.debug_message = 'Close output door';
+        //                 console.log(dry_data_block.state);
+        //                 dry_data_block.state = 'TARGETING';
+        //                 pre_state = '';
+        //                 print_lcd_state();
+        //                 console.log('->' + dry_data_block.state);
+        //
+        //                 core_delay_count = 0;
+        //
+        //                 lift_seq = 0;
+        //                 crusher_seq = 0;
+        //                 lifting();
+        //                 crusher();
+        //
+        //                 targeting_tick_count = 0;
+        //
+        //                 dry_data_block.pre_weight = dry_data_block.cur_weight;
+        //             }
+        //             else {
+        //                 if(input_door_delay_count == 0) {
+        //                     dry_data_block.debug_message = 'Close input door';
+        //                     pre_debug_message = '';
+        //                     set_buzzer();
+        //                 }
+        //
+        //                 input_door_delay_count++;
+        //                 if(input_door_delay_count > 40) {
+        //                     input_door_delay_count = 0;
+        //                 }
+        //             }
+        //         }
+        //         else {
+        //             if(output_door_delay_count == 0) {
+        //                 dry_data_block.debug_message = 'Close output door';
+        //                 pre_debug_message = '';
+        //                 set_buzzer();
+        //             }
+        //
+        //             output_door_delay_count++;
+        //             if(output_door_delay_count > 40) {
+        //                 output_door_delay_count = 0;
+        //             }
+        //         }
+        //     }
+        //     else {
+        //         if(safe_door_delay_count == 0) {
+        //             dry_data_block.debug_message = 'Close safe door';
+        //             pre_debug_message = '';
+        //             set_buzzer();
+        //         }
+        //
+        //         safe_door_delay_count++;
+        //         if(safe_door_delay_count > 40) {
+        //             safe_door_delay_count = 0;
+        //         }
+        //     }
+        // }
+        // else if(dryer_event & EVENT_START_BTN_LONG) {
+        //     dryer_event &= ~EVENT_START_BTN_LONG;
+        //
+        //     dry_data_block.debug_message = 'Reset the catalyst';
         //     pre_debug_message = '';
         //     set_buzzer();
         //
-        //     set_stirrer(TURN_ON);
+        //     dry_data_block.cum_weight = 0;
         // }
-        // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
-        //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        // // else if(dryer_event & EVENT_OUTPUT_DOOR_OPEN) {
+        // //     dryer_event &= ~EVENT_OUTPUT_DOOR_OPEN;
+        // //
+        // //     console.log('EVENT_OUTPUT_DOOR_OPEN');
+        // //
+        // //     dry_data_block.debug_message = 'Close output door';
+        // //     pre_debug_message = '';
+        // //     set_buzzer();
+        // //
+        // //     set_stirrer(TURN_ON);
+        // // }
+        // // else if(dryer_event & EVENT_OUTPUT_DOOR_CLOSE) {
+        // //     dryer_event &= ~EVENT_OUTPUT_DOOR_CLOSE;
+        // //
+        // //     dry_data_block.debug_message = ' ';
+        // //     pre_debug_message = '';
+        // //
+        // //     set_stirrer(TURN_OFF);
+        // // }
+        // // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
+        // //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
+        // //
+        // //     dry_data_block.debug_message = 'Close safe door';
+        // //     pre_debug_message = '';
+        // //     set_buzzer();
+        // // }
+        // // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
+        // //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
+        // //
+        // //     dry_data_block.debug_message = ' ';
+        // //     pre_debug_message = '';
+        // // }
+        // else {
+        //     pre_cur_weight = dry_data_block.cur_weight;
         //
-        //     dry_data_block.debug_message = ' ';
-        //     pre_debug_message = '';
+        //     if (dry_data_block.debug_mode == 1) {
+        //         debug_mode_state = 'start';
         //
-        //     set_stirrer(TURN_OFF);
+        //         console.log(dry_data_block.state);
+        //         dry_data_block.state = 'DEBUG';
+        //         pre_state = '';
+        //         print_lcd_state();
+        //         console.log('->' + dry_data_block.state);
+        //
+        //         set_buzzer();
+        //     }
+        //     else {
+        //     }
         // }
-        // else if(dryer_event & EVENT_SAFE_DOOR_OPEN) {
-        //     dryer_event &= ~EVENT_SAFE_DOOR_OPEN;
-        //
-        //     dry_data_block.debug_message = 'Close safe door';
-        //     pre_debug_message = '';
-        //     set_buzzer();
-        // }
-        // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
-        //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
-        //
-        //     dry_data_block.debug_message = ' ';
-        //     pre_debug_message = '';
-        // }
-        else {
-            pre_cur_weight = dry_data_block.cur_weight;
-
-            if (dry_data_block.debug_mode == 1) {
-                debug_mode_state = 'start';
-
-                console.log(dry_data_block.state);
-                dry_data_block.state = 'DEBUG';
-                pre_state = '';
-                print_lcd_state();
-                console.log('->' + dry_data_block.state);
-
-                set_buzzer();
-            }
-            else {
-            }
-        }
 
         setTimeout(core_watchdog, normal_interval);
     }
