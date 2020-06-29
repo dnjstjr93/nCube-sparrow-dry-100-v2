@@ -849,7 +849,7 @@ function req_internal_temp() {
     if(dry_mqtt_client != null) {
         var msg_obj = {};
 
-        if(dry_data_block.state == 'INPUT') {
+        if(dry_data_block.state == 'INIT') {
         }
         else if(dry_data_block.state == 'DEBUG') {
         }
@@ -923,7 +923,7 @@ function req_weight() {
     if(dry_mqtt_client != null) {
         var msg_obj = {};
 
-        if(dry_data_block.state == 'INPUT') {
+        if(dry_data_block.state == 'INIT') {
         }
         else if(dry_data_block.state == 'DEBUG') {
         }
@@ -1746,7 +1746,7 @@ var cur_weight = 0.0;
 function core_watchdog() {
     //console.log(dry_data_block.debug_mode);
     //console.log(dry_data_block.state);
-    if(dry_data_block.state == 'INPUT') {
+    if(dry_data_block.state == 'INIT') {
         // pre_input_door = -1;
         // pre_output_door = -1;
         // pre_safe_door = -1;
