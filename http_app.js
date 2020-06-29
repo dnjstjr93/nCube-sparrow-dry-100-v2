@@ -656,7 +656,7 @@ catch (e) {
 
 
 var pre_state = 'None';
-var pre_cur_weight = -1.0;
+var pre_cur_weight = 9999;
 var pre_loadcell_factor = -1.0;
 var pre_input_door = -1;
 var pre_output_door = -1;
@@ -1674,6 +1674,10 @@ function dryer_event_handler() {
                 set_buzzer();
             }
             else {
+                pre_input_door = -1;
+                pre_output_door = -1;
+                pre_safe_door = -1;
+                pre_cur_weight = 9999;
             }
         }
 
