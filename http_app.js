@@ -1241,7 +1241,7 @@ function res_input_door(val) {
 function res_weight(val) {
 //     console.log('weight: ' + val);
     dry_data_block.cur_weight = parseFloat(parseFloat(val.toString()).toFixed(1));
-    console.log(dry_data_block.cur_weight);
+    console.log("\r\ncur_weight: " + dry_data_block.cur_weight + "\r\n");
     if (pre_cur_weight != dry_data_block.cur_weight) {
         //console.log(dry_data_block.cur_weight);
         pre_cur_weight = dry_data_block.cur_weight;
