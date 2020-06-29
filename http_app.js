@@ -645,7 +645,7 @@ catch (e) {
     dry_data_block.start_btn = 0;
     dry_data_block.stirrer_mode = 0;
     dry_data_block.elapsed_time = 0;
-    dry_data_block.debug_message = 'INIT';
+    dry_data_block.debug_message = 'INPUT';
     dry_data_block.loadcell_factor = 1841;
     dry_data_block.loadcell_ref_weight = 20;
     dry_data_block.correlation_value = 4.6;
@@ -670,7 +670,7 @@ dry_data_block.input_door = 0;
 dry_data_block.output_door = 0;
 dry_data_block.safe_door = 0;
 
-dry_data_block.state = 'INIT';
+dry_data_block.state = 'INPUT';
 pre_state = '';
 print_lcd_state();
 
