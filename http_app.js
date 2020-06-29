@@ -2081,21 +2081,21 @@ function core_watchdog() {
         //     dry_data_block.debug_message = ' ';
         //     pre_debug_message = '';
         // }
-        else {
-            if (dry_data_block.debug_mode == 1) {
-                debug_mode_state = 'start';
+//         else {
+        if (dry_data_block.debug_mode == 1) {
+            debug_mode_state = 'start';
 
-                console.log(dry_data_block.state);
-                dry_data_block.state = 'DEBUG';
-                pre_state = '';
-                print_lcd_state();
-                console.log('->' + dry_data_block.state);
+            console.log(dry_data_block.state);
+            dry_data_block.state = 'DEBUG';
+            pre_state = '';
+            print_lcd_state();
+            console.log('->' + dry_data_block.state);
 
-                set_buzzer();
-            }
-            else {
-            }
+            set_buzzer();
         }
+        else {
+        }
+//         }
 
         setTimeout(core_watchdog, normal_interval);
     }
