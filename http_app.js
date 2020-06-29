@@ -82,9 +82,15 @@ const EVENT_OUTPUT_DOOR_OPEN = 0x04;
 const EVENT_OUTPUT_DOOR_CLOSE = 0x08;
 const EVENT_SAFE_DOOR_OPEN = 0x10;
 const EVENT_SAFE_DOOR_CLOSE = 0x20;
-const EVENT_START_BTN_CLICK = 0x40;
+const EVENT_START_BUTTON = 0x40;
 const EVENT_START_BTN_LONG = 0x80;
 
+var dryer_event_2 = 0x00;
+
+const EVENT_HEAT_COMPLETE = 0x01;
+const EVENT_LIFT_ACTION = 0x02;
+const EVENT_EXHAUST_COMPLETE = 0x04;
+const EVENT_END_ACTION = 0x08;
 
 // var tas_dryer = spawn('python3', ['./exec.py']);
 // tas_dryer.stdout.on('data', function(data) {
@@ -1321,7 +1327,7 @@ function res_start_btn(val) {
         if(start_press_flag == 1) {
             dry_data_block.start_btn = 1;
 
-            dryer_event |= EVENT_START_BTN_CLICK;
+            dryer_event |= EVENT_START_BUTTON;
         }
         else if(start_press_flag == 2) {
         }
@@ -1469,7 +1475,7 @@ function dryer_heat_event() {
         dry_data_block.elapsed_time++;
 
         if (cur_weight <= parseFloat(dry_data_block.tar_weight3) || dry_data_block.elapsed_time > (5*60*60)) {
-            dryer_event |= EVENT_HEAT_COMPLETE;
+            dryer_event_2 |= EVENT_HEAT_COMPLETE;
         }
     }
     else if (dry_data_block.state == 'TARGETING'){
@@ -1477,7 +1483,7 @@ function dryer_heat_event() {
     }
     else if (dry_data_block.state == 'EXHAUST'){
         if (dry_data_block.cur_weight <= 0.5){
-            dryer_event |= EVENT_EXHAUST_COMPLETE;
+            dryer_event_2 |= EVENT_EXHAUST_COMPLETE;
         }
     }
     setTimeout(dryer_heat_event, 1000);
@@ -1541,8 +1547,8 @@ function dryer_event_handler(){
         }
     }
 
-    if(dryer_event & EVENT_HEAT_COMPLETE) {
-        dryer_event &= ~EVENT_HEAT_COMPLETE;
+    if(dryer_event_2 & EVENT_HEAT_COMPLETE) {
+        dryer_event_2 &= ~EVENT_HEAT_COMPLETE;
         if (dry_data_block.state == 'HEAT'){
             dry_data_block.debug_message = 'HEAT complete';
 
@@ -1555,7 +1561,7 @@ function dryer_event_handler(){
             print_lcd_state();
 
         }
-        dryer_event |= EVENT_END_ACTION;
+        dryer_event_2 |= EVENT_END_ACTION;
     }
 
     if(dryer_event & EVENT_START_BUTTON) {
@@ -1568,11 +1574,11 @@ function dryer_event_handler(){
             pre_state = '';
             print_lcd_state();
         }
-        dryer_event |= EVENT_LIFT_ACTION;
+        dryer_event_2 |= EVENT_LIFT_ACTION;
     }
 
-    if(dryer_event & EVENT_LIFT_ACTION) {
-        dryer_event &= ~EVENT_LIFT_ACTION;
+    if(dryer_event_2 & EVENT_LIFT_ACTION) {
+        dryer_event_2 &= ~EVENT_LIFT_ACTION;
         if (dry_data_block.state == 'TARGETING'){
             lifting();
             crusher();
@@ -1582,8 +1588,8 @@ function dryer_event_handler(){
         print_lcd_state();
     }
 
-    if(dryer_event & EVENT_EXHAUST_COMPLETE) {
-        dryer_event &= ~EVENT_EXHAUST_COMPLETE;
+    if(dryer_event_2 & EVENT_EXHAUST_COMPLETE) {
+        dryer_event_2 &= ~EVENT_EXHAUST_COMPLETE;
         if (dry_data_block.state == 'EXHAUST'){
             dry_data_block.input_door = 0;
             dry_data_block.output_door = 0;
@@ -1597,8 +1603,8 @@ function dryer_event_handler(){
         print_lcd_state();
     }
 
-    if(dryer_event & EVENT_END_ACTION) {
-        dryer_event &= ~EVENT_END_ACTION;
+    if(dryer_event_2 & EVENT_END_ACTION) {
+        dryer_event_2 &= ~EVENT_END_ACTION;
         if (dry_data_block.state == 'END'){
             dry_data_block.input_door = 0;
             dry_data_block.output_door = 0;
@@ -1758,8 +1764,8 @@ function core_watchdog() {
             core_delay_count = 0;
         }
 
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
         }
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
@@ -1867,8 +1873,8 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'INPUT') {
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
 
             if (dry_data_block.safe_door == 0) {
                 if (dry_data_block.output_door == 0) {
@@ -2101,8 +2107,8 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'HEAT') {
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
         }
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
@@ -2254,8 +2260,8 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'END') {
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
         }
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
@@ -2334,8 +2340,8 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'DEBUG') {
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
 
             if(debug_mode_state == 'put_on_waiting') {
 
@@ -2427,8 +2433,8 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'EXCEPTION') {
-        if(dryer_event & EVENT_START_BTN_CLICK) {
-            dryer_event &= ~EVENT_START_BTN_CLICK;
+        if(dryer_event & EVENT_START_BUTTON) {
+            dryer_event &= ~EVENT_START_BUTTON;
         }
         else if(dryer_event & EVENT_START_BTN_LONG) {
             dryer_event &= ~EVENT_START_BTN_LONG;
