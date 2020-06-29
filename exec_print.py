@@ -76,7 +76,7 @@ def displayState(msg1):
 #	if (len(str(msg1)) > 5):
 #		msg1 = str(msg1)
 #		msg1 = msg1[0:5]
-	prev_state = 'START'
+	prev_state = '      '
 	g_lcd.cursor_position(0,0)
 	g_lcd.message = f'{prev_state}'
 	try:
