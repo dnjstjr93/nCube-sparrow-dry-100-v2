@@ -1659,24 +1659,22 @@ function dryer_event_handler() {
 
     if (dryer_event_2 & EVENT_DEBUG_BUTTON) {
         dryer_event_2 &= ~EVENT_DEBUG_BUTTON;
-        // if (dry_data_block.state == 'INPUT') {
-        pre_cur_weight = dry_data_block.cur_weight;
+        if (dry_data_block.state == 'INPUT') {
+            pre_cur_weight = dry_data_block.cur_weight;
 
-        if (dry_data_block.debug_mode == 1) {
-            debug_mode_state = 'start';
+            if (dry_data_block.debug_mode == 1) {
+                debug_mode_state = 'start';
 
-            console.log(dry_data_block.state);
-            dry_data_block.state = 'DEBUG';
-            pre_state = '';
-            print_lcd_state();
-            console.log('->' + dry_data_block.state);
+                console.log(dry_data_block.state);
+                dry_data_block.state = 'DEBUG';
+                pre_state = '';
+                print_lcd_state();
+                console.log('->' + dry_data_block.state);
 
-            set_buzzer();
-        }
-        else{
-            pre_input_door = -1;
-            pre_output_door = -1;
-            pre_safe_door = -1;
+                set_buzzer();
+            }
+            else {
+            }
         }
 
         if (dry_data_block.state == 'DEBUG'){
