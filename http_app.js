@@ -1660,8 +1660,7 @@ function dryer_event_handler() {
     if (dryer_event_2 & EVENT_DEBUG_BUTTON) {
         dryer_event_2 &= ~EVENT_DEBUG_BUTTON;
         if (dry_data_block.state == 'INPUT') {
-            pre_cur_weight = dry_data_block.cur_weight;
-
+            // pre_cur_weight = dry_data_block.cur_weight;
 
             if (dry_data_block.debug_mode == 1) {
                 debug_mode_state = 'start';
@@ -1673,6 +1672,11 @@ function dryer_event_handler() {
                 console.log('->' + dry_data_block.state);
 
                 set_buzzer();
+            }
+            else{
+                pre_input_door = -1;
+                pre_output_door = -1;
+                pre_safe_door = -1;
             }
         }
         if (dry_data_block.state == 'DEBUG'){
@@ -1724,7 +1728,7 @@ function dryer_event_handler() {
                         dry_data_block.debug_message = 'Put weight on - ' + dry_data_block.loadcell_ref_weight;
                         pre_debug_message = '';
 
-                        debug_mode_state = 'put_on_waiting';
+                        debug_mode_state = 'Put_on_waiting';
 
                         setTimeout(core_watchdog, normal_interval);
                     }
@@ -1732,7 +1736,7 @@ function dryer_event_handler() {
                         dry_data_block.debug_message = 'Complete zero point';
                         pre_debug_message = '';
 
-                        debug_mode_state = 'completed';
+                        debug_mode_state = 'Completed';
 
                         var obj = {};
                         obj.loadcell_factor = dry_data_block.loadcell_factor;
@@ -2642,17 +2646,17 @@ function core_watchdog() {
     }
 
     else if(dry_data_block.state == 'DEBUG') {
-        if(dryer_event & EVENT_START_BUTTON) {
-            dryer_event &= ~EVENT_START_BUTTON;
-
-            if(debug_mode_state == 'put_on_waiting') {
-
-                dry_data_block.debug_message = 'Calculating';
-                pre_debug_message = '';
-
-                req_calc_factor();
-            }
-        }
+        // if(dryer_event & EVENT_START_BUTTON) {
+        //     dryer_event &= ~EVENT_START_BUTTON;
+        //
+        //     if(debug_mode_state == 'put_on_waiting') {
+        //
+        //         dry_data_block.debug_message = 'Calculating';
+        //         pre_debug_message = '';
+        //
+        //         req_calc_factor();
+        //     }
+        // }
         // else if(dryer_event & EVENT_START_BTN_LONG) {
         //     dryer_event &= ~EVENT_START_BTN_LONG;
         // }
@@ -2674,62 +2678,62 @@ function core_watchdog() {
         // else if(dryer_event & EVENT_SAFE_DOOR_CLOSE) {
         //     dryer_event &= ~EVENT_SAFE_DOOR_CLOSE;
         // }
-        else {
-            if (dry_data_block.debug_mode == 0) {
-                set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-                set_stirrer(TURN_OFF);
-
-                set_buzzer();
-
-                console.log(dry_data_block.state);
-                dry_data_block.state = 'INPUT';
-                pre_state = '';
-                print_lcd_state();
-                console.log('->' + dry_data_block.state);
-
-                dry_data_block.debug_message = ' ';
-                pre_debug_message = '';
-
-                dry_data_block.elapsed_time = 0;
-
-                pre_cur_weight = 9999;
-            }
-            else {
-                if (debug_mode_state == 'start') {
-                    console.log("Start zero point");
-
-                    dry_data_block.debug_message = 'Start zero point';
-                    pre_debug_message = '';
-
-                    req_zero_point();
-
-                    debug_mode_state = 'start_waiting';
-
-                    setTimeout(core_watchdog, normal_interval);
-                }
-                else if (debug_mode_state == 'put_on') {
-                    dry_data_block.debug_message = 'Put weight on - ' + dry_data_block.loadcell_ref_weight;
-                    pre_debug_message = '';
-
-                    debug_mode_state = 'put_on_waiting';
-
-                    setTimeout(core_watchdog, normal_interval);
-                }
-                else if (debug_mode_state == 'complete') {
-                    dry_data_block.debug_message = 'Complete zero point';
-                    pre_debug_message = '';
-
-                    debug_mode_state = 'completed';
-
-                    var obj = {};
-                    obj.loadcell_factor = dry_data_block.loadcell_factor;
-                    obj.correlation_value = dry_data_block.correlation_value;
-                    send_to_Mobius(zero_mission_name, obj);
-                }
-                else {
-                }
-            }
-        }
+        // else {
+        //     if (dry_data_block.debug_mode == 0) {
+        //         set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
+        //         set_stirrer(TURN_OFF);
+        //
+        //         set_buzzer();
+        //
+        //         console.log(dry_data_block.state);
+        //         dry_data_block.state = 'INPUT';
+        //         pre_state = '';
+        //         print_lcd_state();
+        //         console.log('->' + dry_data_block.state);
+        //
+        //         dry_data_block.debug_message = ' ';
+        //         pre_debug_message = '';
+        //
+        //         dry_data_block.elapsed_time = 0;
+        //
+        //         pre_cur_weight = 9999;
+        //     }
+        //     else {
+        //         if (debug_mode_state == 'start') {
+        //             console.log("Start zero point");
+        //
+        //             dry_data_block.debug_message = 'Start zero point';
+        //             pre_debug_message = '';
+        //
+        //             req_zero_point();
+        //
+        //             debug_mode_state = 'start_waiting';
+        //
+        //             setTimeout(core_watchdog, normal_interval);
+        //         }
+        //         else if (debug_mode_state == 'put_on') {
+        //             dry_data_block.debug_message = 'Put weight on - ' + dry_data_block.loadcell_ref_weight;
+        //             pre_debug_message = '';
+        //
+        //             debug_mode_state = 'put_on_waiting';
+        //
+        //             setTimeout(core_watchdog, normal_interval);
+        //         }
+        //         else if (debug_mode_state == 'complete') {
+        //             dry_data_block.debug_message = 'Complete zero point';
+        //             pre_debug_message = '';
+        //
+        //             debug_mode_state = 'completed';
+        //
+        //             var obj = {};
+        //             obj.loadcell_factor = dry_data_block.loadcell_factor;
+        //             obj.correlation_value = dry_data_block.correlation_value;
+        //             send_to_Mobius(zero_mission_name, obj);
+        //         }
+        //         else {
+        //         }
+        //     }
+        // }
 
         setTimeout(core_watchdog, normal_interval);
     }
