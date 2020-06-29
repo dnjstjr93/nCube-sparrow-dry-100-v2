@@ -668,7 +668,7 @@ dry_data_block.state = 'INPUT';
 pre_state = '';
 print_lcd_state();
 
-dry_data_block.debug_message = 'Initialize';
+dry_data_block.debug_message = '                  ';
 pre_debug_message = '';
 
 
@@ -1595,7 +1595,7 @@ function dryer_event_handler(){
             dry_data_block.output_door = 0;
             dry_data_block.safe_door = 0;
 
-            dry_data_block.debug_message = 'Initialize';
+            dry_data_block.debug_message = '                 ';
             pre_debug_message = '';
         }
         dry_data_block.state = 'INPUT';
@@ -1610,7 +1610,7 @@ function dryer_event_handler(){
             dry_data_block.output_door = 0;
             dry_data_block.safe_door = 0;
 
-            dry_data_block.debug_message = 'Initialize';
+            dry_data_block.debug_message = '                   ';
             pre_debug_message = '';
         }
         dry_data_block.state = 'INPUT';
