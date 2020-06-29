@@ -290,6 +290,14 @@ function retrieve_my_cnt_name(callback) {
                 dry_data_block.loadcell_ref_weight = parseFloat(parseFloat(dry_info.loadcell_ref_weight.toString()).toFixed(1));
             }
 
+            if(dry_info.hasOwnProperty('ref_external_temp')) {
+                dry_data_block.ref_external_temp = parseFloat(parseFloat(dry_info.ref_external_temp.toString()).toFixed(1));
+            }
+
+            if(dry_info.hasOwnProperty('ref_internal_temp')) {
+                dry_data_block.ref_internal_temp = parseFloat(parseFloat(dry_info.ref_internal_temp.toString()).toFixed(1));
+            }
+
             MQTT_SUBSCRIPTION_ENABLE = 1;
             sh_state = 'crtct';
             setTimeout(http_watchdog, normal_interval);
@@ -604,7 +612,9 @@ try {
     dry_data_block = JSON.parse(fs.readFileSync('ddb.json', 'utf8'));
 }
 catch (e) {
-    dry_data_block.state = 'INIT';
+    dry_data_block.state = 'INPUT';
+    dry_data_block.ref_internal_temp = 80.0;
+    dry_data_block.ref_external_temp = 280.0;
     dry_data_block.internal_temp = 0.0;
     dry_data_block.external_temp = 0.0;
     dry_data_block.cur_weight = 0.0;
@@ -833,7 +843,7 @@ function req_internal_temp() {
     if(dry_mqtt_client != null) {
         var msg_obj = {};
 
-        if(dry_data_block.state == 'INIT') {
+        if(dry_data_block.state == 'INPUT') {
         }
         else if(dry_data_block.state == 'DEBUG') {
         }
@@ -907,7 +917,7 @@ function req_weight() {
     if(dry_mqtt_client != null) {
         var msg_obj = {};
 
-        if(dry_data_block.state == 'INIT') {
+        if(dry_data_block.state == 'INPUT') {
         }
         else if(dry_data_block.state == 'DEBUG') {
         }
@@ -1730,7 +1740,7 @@ var cur_weight = 0.0;
 function core_watchdog() {
     //console.log(dry_data_block.debug_mode);
     //console.log(dry_data_block.state);
-    if(dry_data_block.state == 'INIT') {
+    if(dry_data_block.state == 'INPUT') {
         pre_input_door = -1;
         pre_output_door = -1;
         pre_safe_door = -1;
@@ -2099,7 +2109,7 @@ function core_watchdog() {
 
             set_buzzer();
 
-            dry_data_block.state = 'INIT';
+            dry_data_block.state = 'INPUT';
             pre_state = '';
             print_lcd_state();
 
@@ -2279,7 +2289,7 @@ function core_watchdog() {
 
                 set_buzzer();
 
-                dry_data_block.state = 'INIT';
+                dry_data_block.state = 'INPUT';
                 pre_state = '';
                 print_lcd_state();
 
@@ -2296,7 +2306,7 @@ function core_watchdog() {
 
                     set_buzzer();
 
-                    dry_data_block.state = 'INIT';
+                    dry_data_block.state = 'INPUT';
                     pre_state = '';
                     print_lcd_state();
 
@@ -2364,7 +2374,7 @@ function core_watchdog() {
                 set_buzzer();
 
                 console.log(dry_data_block.state);
-                dry_data_block.state = 'INIT';
+                dry_data_block.state = 'INPUT';
                 pre_state = '';
                 print_lcd_state();
                 console.log('->' + dry_data_block.state);
