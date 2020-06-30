@@ -138,13 +138,10 @@ def mqtt_dequeue():
 		q.task_done()
 
 def core_func():
-	# period = 10000
-	# while_count = 0
 	global g_buzzer_event
 	global g_set_buzzer_val
 
 	while True:
-		# while_count = while_count + 1
 		if g_buzzer_event & SET_BUZZER:
 			g_buzzer_event &= (~SET_BUZZER)
 			buzzer(g_set_buzzer_val)
