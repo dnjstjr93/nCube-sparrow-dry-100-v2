@@ -140,6 +140,7 @@ def on_connect(client,userdata,flags, rc):
 	dry_client.subscribe("/set_lift")
 	dry_client.subscribe("/set_crusher")
 	dry_client.subscribe("/set_cleaning_pump")
+	dry_client.subscribe("/req_input_door")
 
 
 def on_disconnect(client, userdata, flags, rc=0):
@@ -322,7 +323,7 @@ def core_func():
 			# l_dec_val = ctl.DIN(0)
 
 			# g_res_door_btn = val_to_json(l_dec_val)
-			
+
 			# dry_client.publish("/res_input_door", json_input_door)
 			
 		mqtt_dequeue()
