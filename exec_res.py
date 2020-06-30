@@ -18,11 +18,18 @@ g_res_calc_factor = {}
 g_set_zero_point = 0.0
 
 q = queue.Queue()
-global arr_count
+# global arr_count
 arr_count = 5
-global bottom_temp_arr, top_temp_arr
+# global bottom_temp_arr, top_temp_arr
 bottom_temp_arr = [0,0,0,0,0]
 top_temp_arr = [0,0,0,0,0]
+
+avg_bottom_temp = 0.0
+avg_top_temp = 0.0
+nWeightCount = 1
+weight_arr = [0, 0, 0, 0, 0]
+flag = 0
+get_correlation_value = 0.0
 
 #---Parse Data----------------------------------------------------------
 def json_to_val(json_val):
@@ -73,6 +80,9 @@ sensor2 = MAX6675.MAX6675(CLK2, CS2, SO2)
 #---GET Temperature-----------------------------------------------------
 def get_temp():
 	global avg_bottom_temp, avg_top_temp
+	global arr_count
+	global bottom_temp_arr, top_temp_arr
+	
 	top_temp = round(sensor1.readTempC(), 1)
 	bottom_temp = round(sensor2.readTempC(), 1)
 
@@ -104,7 +114,7 @@ def cleanAndExit():
 def init_loadcell(referenceUnit = 1):
 	global hx
 	global nWeightCount
-	nWeightCount = 1
+	# nWeightCount = 1
 
 	hx = HX711(HX711_DAT, HX711_CLK)
 	hx.set_reading_format("MSB", "MSB")
@@ -121,7 +131,9 @@ def set_factor(referenceUnit):
 def get_loadcell():
 	global flag
 	global weight_arr
-
+	global arr_count
+	global get_correlation_value
+	
 	try:
 		if (flag == 0):
 			for i in range(arr_count):
@@ -136,10 +148,11 @@ def get_loadcell():
 				weight_arr[arr_count-1] = weight
 
 		avg_weight = round((sum(weight_arr) / arr_count), 1)
-		final_weight = avg_weight - correlation_value
+		print("===Correlation_Value: ", get_correlation_value)
+		final_weight = avg_weight - get_correlation_value
 		final_weight = max(0, float(final_weight))
 		print('weight_arr: ', weight_arr)
-		print('get_loadcell - correlation_value: ', correlation_value)
+		print('get_loadcell - correlation_value: ', get_correlation_value)
 		print('get_loadcell - avg_weight: ', avg_weight)
 		print('get_loadcell - final_weight: ', final_weight)
 		weight_json = val_to_json(final_weight)
@@ -171,6 +184,8 @@ def ref_weight(tare_weight):
 
 
 def calc_ref_Unit(reference_weight, cal_set_ref_Unit):
+	global get_correlation_value
+	
 	print('calc_ref_Unit: ', reference_weight, ' ', cal_set_ref_Unit)
 
 	ref_weight_total = 0
@@ -203,6 +218,7 @@ def calc_ref_Unit(reference_weight, cal_set_ref_Unit):
 	# avg_factor_weight = max(0, float(avg_factor_weight))
 	correlation_value = avg_factor_weight - reference_weight
 	factor = {"factor":cur_factor, "correlation_value":correlation_value}
+	get_correlation_value = correlation_value
 	print('calc_ref_Unit - avg_factor_weight: ', avg_factor_weight)
 	print('calc_ref_Unit - correlation_value: ', correlation_value)
 	with open ("./factor.json", "w") as factor_json:
@@ -250,6 +266,7 @@ def on_message(client, userdata, _msg):
     global referenceUnit
     global correlation_value
     global loadcell_corr_val
+    global get_correlation_value
     referenceUnit = 1
     correlation_value = loadcell_corr_val
 
@@ -275,7 +292,7 @@ def on_message(client, userdata, _msg):
     elif _msg.topic == '/set_zero_point':
         referenceUnit, set_corr_val = json_to_val(data)
         g_set_zero_point = float(referenceUnit)
-        correlation_value = float(set_corr_val)
+        get_correlation_value = float(set_corr_val)
         g_res_event |= SET_ZERO_POINT
 
 
@@ -315,8 +332,8 @@ else:
 
 init_loadcell(loadcell_factor)
 
-weight_arr = [0, 0, 0, 0, 0]
-flag = 0
+# weight_arr = [0, 0, 0, 0, 0]
+# flag = 0
 
 def core_func():
 	period = 1
@@ -339,7 +356,7 @@ def core_func():
 	global correlation_value
 	global loadcell_corr_val
 	referenceUnit = 1
-	correlation_value = loadcell_corr_val
+	#correlation_value = loadcell_corr_val
 
 	while True:
 		if g_res_event & RES_TEMPERATURE:

@@ -27,12 +27,6 @@ g_set_crusher_val = {}
 g_set_cleaning_pump_val = {}
 
 q = queue.Queue()
-global arr_count
-arr_count = 5
-global bottom_temp_arr, top_temp_arr
-bottom_temp_arr = [0,0,0,0,0]
-top_temp_arr = [0,0,0,0,0]
-
 
 #---SET Pin-------------------------------------------------------------
 # Load Cell (Direct)
