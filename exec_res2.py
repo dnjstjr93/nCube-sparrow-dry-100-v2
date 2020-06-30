@@ -140,7 +140,7 @@ def on_connect(client,userdata,flags, rc):
 	dry_client.subscribe("/set_lift")
 	dry_client.subscribe("/set_crusher")
 	dry_client.subscribe("/set_cleaning_pump")
-	dry_client.subscribe("/req_input_door")
+# 	dry_client.subscribe("/req_input_door")
 
 
 def on_disconnect(client, userdata, flags, rc=0):
@@ -197,11 +197,11 @@ def on_message(client, userdata, _msg):
 		g_set_cleaning_pump_val = json_to_val(data)
 		g_set_event |= SET_CLEANING_PUMP
 
-	elif _msg.topic == '/req_input_door':
-		l_dec_val = ctl.DIN(0)
-
-		g_res_door_btn = val_to_json(l_dec_val)
-		g_res_event |= RES_INPUT_DOOR
+# 	elif _msg.topic == '/req_input_door':
+# 		l_dec_val = ctl.DIN(0)
+#
+# 		g_res_door_btn = val_to_json(l_dec_val)
+# 		g_res_event |= RES_INPUT_DOOR
 
 	func_set_q(_msg)
 #-----------------------------------------------------------------------
@@ -279,8 +279,8 @@ def mqtt_dequeue():
 		q.task_done()
 
 def core_func():
-	# period = 20000
-	# while_count = 0
+	period = 20000
+	while_count = 0
 	global g_res_event
 	global g_res_door_btn
 
@@ -312,19 +312,19 @@ def core_func():
 			g_set_event &= (~SET_CLEANING_PUMP)
 			cleaning_pump(g_set_cleaning_pump_val)
 
-		elif g_res_event & RES_INPUT_DOOR:
-			g_res_event &= (~RES_INPUT_DOOR)
-			dry_client.publish("/res_input_door", g_res_door_btn)
+# 		elif g_res_event & RES_INPUT_DOOR:
+# 			g_res_event &= (~RES_INPUT_DOOR)
+# 			dry_client.publish("/res_input_door", g_res_door_btn)
 
-		# while_count += 1
-		# if (while_count > period):
-			# while_count = 0
+		while_count += 1
+		if (while_count > period):
+			while_count = 0
 
-			# l_dec_val = ctl.DIN(0)
+			l_dec_val = ctl.DIN(0)
 
-			# g_res_door_btn = val_to_json(l_dec_val)
+			g_res_door_btn = val_to_json(l_dec_val)
 
-			# dry_client.publish("/res_input_door", json_input_door)
+			dry_client.publish("/res_input_door", json_input_door)
 			
 		mqtt_dequeue()
 
