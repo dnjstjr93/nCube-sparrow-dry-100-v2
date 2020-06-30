@@ -29,7 +29,7 @@ var HTTP_SUBSCRIPTION_ENABLE = 0;
 var MQTT_SUBSCRIPTION_ENABLE = 0;
 
 global.my_data_name = '';
-global.dry_roadcell = '';
+global.dry_loadcell = '';
 global.my_parent_cnt_name = '';
 global.my_cnt_name = '';
 global.pre_my_cnt_name = '';
@@ -2860,11 +2860,10 @@ setTimeout(food_watchdog, 1000);
 
 function food_watchdog(){
     //100ms동작
-    //실시간으로 변경되는상태값 저장
-    //roadcell_lunch() //roadcell측정
+    //실시간으로 변경되는 상태값 저장
 
     internal_temp_timer = setTimeout(req_internal_temp, 1500);
-    //input_door_timer = setTimeout(req_input_door, parseInt(Math.random()*10));
+    input_door_timer = setTimeout(req_input_door, 250);
     //output_door_timer = setTimeout(req_output_door, parseInt(Math.random()*10));
     //safe_door_timer = setTimeout(req_safe_door, parseInt(Math.random()*10));
     weight_timer = setTimeout(req_weight, 1500);

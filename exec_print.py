@@ -5,7 +5,6 @@ import paho.mqtt.client as mqtt
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 
 g_print_event = 0x00
-g_print_event_2 = 0x00
 
 LCD_DEBUG = 0x01
 LCD_INPUT_DOOR = 0x02
@@ -15,6 +14,9 @@ LCD_TEMPERATURE = 0X10
 LCD_STATE = 0x20
 LCD_LOADCELL = 0x40
 LCD_LOADCELL_FACTOR = 0x80
+
+g_print_event_2 = 0x00
+
 LCD_ELAPSED_TIME = 0x01
 
 g_print_debug = ''

@@ -3,6 +3,27 @@ import paho.mqtt.client as mqtt
 import MAX6675
 from hx711 import HX711
 
+g_res_event = 0x00
+
+RES_TEMPERATURE = 0x01
+RES_WEIGHT = 0x02
+RES_ZERO_POINT = 0x04
+RES_CALC_FACTOR = 0x08
+SET_ZERO_POINT = 0x10
+
+g_res_internal_temp = {}
+g_res_weight = {}
+g_res_zero_point = {}
+g_res_calc_factor = {}
+g_set_zero_point = 0.0
+
+q = queue.Queue()
+global arr_count
+arr_count = 5
+global bottom_temp_arr, top_temp_arr
+bottom_temp_arr = [0,0,0,0,0]
+top_temp_arr = [0,0,0,0,0]
+
 #---Parse Data----------------------------------------------------------
 def json_to_val(json_val):
 	payloadData = json.loads(json_val)
@@ -30,36 +51,10 @@ def val_to_json(val,val2=None):
 	return (json_val)
 #-----------------------------------------------------------------------
 
-
-g_res_event = 0x00
-
-RES_TEMPERATURE = 0x01
-RES_WEIGHT = 0x02
-RES_ZERO_POINT = 0x04
-RES_CALC_FACTOR = 0x08
-SET_ZERO_POINT = 0x10
-
-g_res_internal_temp = val_to_json(0.0, 0.0)
-g_res_weight = val_to_json(0.0)
-g_res_zero_point = val_to_json(0.0)
-g_res_calc_factor = val_to_json(0.0, 0.0)
-g_set_zero_point = 0.0
-
-q = queue.Queue()
-global arr_count
-arr_count = 5
-global bottom_temp_arr, top_temp_arr
-bottom_temp_arr = [0,0,0,0,0]
-top_temp_arr = [0,0,0,0,0]
-
 #---SET Pin-------------------------------------------------------------
 # Load Cell (Direct)
 HX711_DAT = 6
 HX711_CLK = 7
-
-# Digital IN
-
-# Switch
 
 # Temperature 1 Top
 CLK1 = 17 #

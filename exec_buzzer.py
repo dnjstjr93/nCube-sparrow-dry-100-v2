@@ -2,6 +2,11 @@ import json, queue, time
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
+g_buzzer_event = 0x00
+
+SET_BUZZER = 0x01
+
+g_set_buzzer_val = 0
 
 q = queue.Queue()
 
@@ -84,6 +89,15 @@ def func_set_q(f_msg):
 
 
 def on_message(client, userdata, _msg):
+	global g_buzzer_event
+	global g_set_buzzer_val
+
+	if _msg.topic == '/set_buzzer':
+# 		buzzer_running = 1
+		data = _msg.payload.decode('utf-8').replace("'", '"')
+		g_set_buzzer_val = json_to_val(data)
+		g_buzzer_event |= SET_BUZZER
+
 	func_set_q(_msg)
 #-----------------------------------------------------------------------
 
@@ -111,23 +125,30 @@ def mqtt_dequeue():
 			g_recv_topic = recv_msg.topic
 			# print(g_recv_topic)
 
-			if (g_recv_topic == '/set_buzzer'):
-				#print("topic: ", g_recv_topic)
-				buzzer_running = 1
-				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				buzzer_val = json_to_val(data)
-				buzzer(buzzer_val)
-				buzzer_running = 0
+# 			if (g_recv_topic == '/set_buzzer'):
+# 				#print("topic: ", g_recv_topic)
+# 				buzzer_running = 1
+# 				data = recv_msg.payload.decode('utf-8').replace("'", '"')
+# 				buzzer_val = json_to_val(data)
+# 				buzzer(buzzer_val)
+# 				buzzer_running = 0
 
 		except queue.Empty:
 			pass
 		q.task_done()
 
 def core_func():
-	period = 10000
-	while_count = 0
+	# period = 10000
+	# while_count = 0
+	global g_buzzer_event
+	global g_set_buzzer_val
+
 	while True:
-		while_count = while_count + 1
+		# while_count = while_count + 1
+		if g_buzzer_event & SET_BUZZER:
+			g_buzzer_event &= (~SET_BUZZER)
+			buzzer(g_set_buzzer_val)
+
 		mqtt_dequeue()
 
 if __name__ == "__main__":
