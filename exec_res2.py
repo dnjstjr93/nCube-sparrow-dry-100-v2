@@ -66,10 +66,13 @@ def heater(val):
 
 #---Stirrer-------------------------------------------------------------
 def stirrer(val):
+	print('stirrer value: ', val)
 	ctl.DOUT(Stirrer_pin,val)
 
 #---Lift----------------------------------------------------------------
 def lift(val):
+	print('lift value: ', val)
+
 	if (val == -1):
 		ctl.DOUT(Lift_pin,1)
 		ctl.DOUT(Lift2_pin,0)
@@ -82,16 +85,22 @@ def lift(val):
 
 #---Crusher-------------------------------------------------------------
 def crusher(val):
+	print('crusher value: ', val)
+
 	ctl.DOUT(Crusher_pin,val)
 
 #---Cooling_Fan---------------------------------------------------------
 def cooling_fan(val):
+	print('cooling_fan value: ', val)
+
 	ctl.DOUT(Cooling_Fan_pin,val)
 	ctl.DOUT(Circulator_pin,val)
 	ctl.DOUT(Pump_pin,val)
 	
 #---Cleaning_Pump-------------------------------------------------------
 def cleaning_pump(val):
+	print('cleaning_pump value: ', val)
+
 	ctl.DOUT(Cleaning_Pump_pin,val)
 
 # #---Thyristor Power Regulator-------------------------------------------
