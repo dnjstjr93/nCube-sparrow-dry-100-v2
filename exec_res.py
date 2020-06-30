@@ -101,9 +101,9 @@ def get_loadcell():
 		avg_weight = round((sum(weight_arr) / arr_count), 1)
 		final_weight = avg_weight - correlation_value
 		final_weight = max(0, float(final_weight))
-		#print('weight_arr: ', weight_arr)
-		#print('get_loadcell - correlation_value: ', correlation_value)
-		#print('get_loadcell - avg_weight: ', avg_weight)
+		print('weight_arr: ', weight_arr)
+		print('get_loadcell - correlation_value: ', correlation_value)
+		print('get_loadcell - avg_weight: ', avg_weight)
 		print('get_loadcell - final_weight: ', final_weight)
 		weight_json = val_to_json(final_weight)
 
@@ -272,8 +272,9 @@ def core_func():
 	global req_zero_ref_weight
 	global referenceUnit
 	global correlation_value
+	global loadcell_corr_val
 	referenceUnit = 1
-	correlation_value = 200
+	correlation_value = loadcell_corr_val
 
 	while True:
 
@@ -302,6 +303,7 @@ def core_func():
 				elif (g_recv_topic == '/req_calc_factor'):
 					#print("topic: ", g_recv_topic)
 					calc_referenceUnit = calc_ref_Unit(req_zero_ref_weight, referenceUnit)
+					print("Core-calc_referenceUnit: ", calc_referenceUnit)
 					dry_client.publish("/res_calc_factor", calc_referenceUnit)
 
 				elif (g_recv_topic == '/req_weight'):
