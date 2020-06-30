@@ -324,7 +324,7 @@ def core_func():
 
 			g_res_door_btn = val_to_json(l_dec_val)
 
-			dry_client.publish("/res_input_door", json_input_door)
+			dry_client.publish("/res_input_door", g_res_door_btn)
 			
 		mqtt_dequeue()
 
