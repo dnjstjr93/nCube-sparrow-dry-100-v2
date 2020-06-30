@@ -4,6 +4,18 @@ import board, busio
 import paho.mqtt.client as mqtt
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 
+g_event = 0x00
+
+LCD_DEBUG = 0x01
+LCD_INPUT_DOOR = 0x02
+LCD_OUTPUT_DOOR = 0x04
+LCD_SAFE_DOOR = 0x08
+
+g_debug = ''
+g_input_door = 0
+g_output_door = 0
+g_safe_door = 0
+
 q = queue.Queue()
 
 #---SET Pin-------------------------------------------------------------
@@ -55,7 +67,34 @@ def func_set_q(f_msg):
 
 
 def on_message(client, userdata, _msg):
+	global g_event
+	global g_debug
+	global g_input_door
+	global g_output_door
+	global g_safe_door
+
+	if _msg.topic == '/print_lcd_debug_message':
+		data = _msg.payload.decode('utf-8').replace("'", '"')
+		g_debug = json_to_val(data)
+		g_event |= LCD_DEBUG
+		
+	elif _msg.topic == '/print_lcd_input_door':
+		data = _msg.payload.decode('utf-8').replace("'", '"')
+		g_input_door = json_to_val(data)
+		g_event |= LCD_INPUT_DOOR
+	
+	elif _msg.topic == '/print_lcd_output_door':
+		data = _msg.payload.decode('utf-8').replace("'", '"')
+		g_output_door = json_to_val(data)
+		g_event |= LCD_OUTPUT_DOOR
+		
+	elif _msg.topic == '/print_lcd_safe_door':
+		data = _msg.payload.decode('utf-8').replace("'", '"')
+		g_safe_door = json_to_val(data)
+		g_event |= LCD_SAFE_DOOR
+	
 	func_set_q(_msg)
+	
 #-----------------------------------------------------------------------
 
 #---INIT LCD & Display Message------------------------------------------
@@ -346,13 +385,13 @@ def mqtt_dequeue():
 				displayState(state)
 				# print('print_lcd_state')
 
-			elif (g_recv_topic == '/print_lcd_debug_message'):
-				#print("topic: ", g_recv_topic)
-				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				debug = json_to_val(data)
-				#print (debug)
-				displayMsg(debug)
-				# print('print_lcd_debug_message')
+			# elif (g_recv_topic == '/print_lcd_debug_message'):
+				# #print("topic: ", g_recv_topic)
+				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
+				# debug = json_to_val(data)
+				# #print (debug)
+				# displayMsg(debug)
+				# # print('print_lcd_debug_message')
 
 			elif (g_recv_topic == '/print_lcd_loadcell'):
 				#print("topic: ", g_recv_topic)
@@ -371,30 +410,30 @@ def mqtt_dequeue():
 				loadcell_factor, corr_val = json_to_val(data)
 				displayLoadcellFactor(loadcell_factor)
 
-			elif (g_recv_topic == '/print_lcd_input_door'):
-				#print("topic: ", g_recv_topic)
-				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				print('input_door:', data)
-				input_door = json_to_val(data)
-				print('input_door:', input_door)
-				displayInputDoor(input_door)
+			# elif (g_recv_topic == '/print_lcd_input_door'):
+				# #print("topic: ", g_recv_topic)
+				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
+				# print('input_door:', data)
+				# input_door = json_to_val(data)
+				# print('input_door:', input_door)
+				# displayInputDoor(input_door)
 
-			elif (g_recv_topic == '/print_lcd_output_door'):
-				#print("topic: ", g_recv_topic)
-				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				print('output:', data)
-				output_door = json_to_val(data)
-				print('output_door:', output_door)
-				displayOutputDoor(output_door)
-				# print('print_lcd_output_door')
+			# elif (g_recv_topic == '/print_lcd_output_door'):
+				# #print("topic: ", g_recv_topic)
+				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
+				# print('output:', data)
+				# output_door = json_to_val(data)
+				# print('output_door:', output_door)
+				# displayOutputDoor(output_door)
+				# # print('print_lcd_output_door')
 
-			elif (g_recv_topic == '/print_lcd_safe_door'):
-				#print("topic: ", g_recv_topic)
-				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				print('safe_door:', data)
-				val_safe_door = json_to_val(data)
-				print('safe_door:', val_safe_door)
-				displaySafeDoor(val_safe_door)
+			# elif (g_recv_topic == '/print_lcd_safe_door'):
+				# #print("topic: ", g_recv_topic)
+				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
+				# print('safe_door:', data)
+				# val_safe_door = json_to_val(data)
+				# print('safe_door:', val_safe_door)
+				# displaySafeDoor(val_safe_door)
 
 			elif (g_recv_topic == '/print_lcd_elapsed_time'):
 				#print("topic: ", g_recv_topic)
@@ -408,11 +447,30 @@ def mqtt_dequeue():
 		q.task_done()
 
 def core_func():
+	global g_event
+	global g_debug
+	global g_input_door
+	global g_output_door
+	global g_safe_door
+	
+		
 	period = 10000
 	while_count = 0
 	while True:
 		while_count = while_count + 1
 		mqtt_dequeue()
+		if g_event & LCD_DEBUG:
+			g_event &= (~LCD_DEBUG)
+			displayMsg(g_debug)
+		elif g_event & LCD_INPUT_DOOR:
+			g_event &= (~LCD_INPUT_DOOR)
+			displayInputDoor(g_input_door)
+		elif g_event & LCD_OUTPUT_DOOR:
+			g_event &= (~LCD_OUTPUT_DOOR)
+			displayOutputDoor(g_output_door)
+		elif g_event & LCD_SAFE_DOOR:
+			g_event &= (~LCD_SAFE_DOOR)
+			displaySafeDoor(g_safe_door)
 
 
 if __name__ == "__main__":
