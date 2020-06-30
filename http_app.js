@@ -1006,7 +1006,7 @@ function res_zero_point(val) {
 
 function res_calc_factor(val, val2) {
     dry_data_block.loadcell_factor = parseFloat(parseFloat(val.toString()).toFixed(1));
-    dry_data_block.correlation_value = parseFloat(parseFloat(val2.toString()).toFixed(1));
+    dry_data_block.correlation_value = parseFloat(parseFloat(val2.toString()).toFixed(2));
 
     debug_mode_state = 'complete';
 }
