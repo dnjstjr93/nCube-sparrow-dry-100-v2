@@ -1721,6 +1721,22 @@ function dryer_event_handler() {
                 print_lcd_state();
                 console.log('->' + dry_data_block.state);
 
+                sh_adn.rtvct(zero_mission_name+'/la', 0, function (rsc, res_body, count) {
+                    if (rsc == 2000) {
+                        var zero_obj = res_body[Object.keys(res_body)[0]].con;
+
+                        dry_data_block.loadcell_factor = zero_obj.loadcell_factor;
+                        dry_data_block.correlation_value = zero_obj.correlation_value;
+
+                        if(dry_mqtt_client != null) {
+                            var msg_obj = {};
+                            msg_obj.val = dry_data_block.loadcell_factor;
+                            msg_obj.val2 = dry_data_block.correlation_value;
+                            dry_mqtt_client.publish('/set_zero_point', JSON.stringify(msg_obj));
+                        }
+                    }
+                });
+
                 dry_data_block.debug_message = ' ';
                 pre_debug_message = '';
                 pre_input_door = -1;
