@@ -3,7 +3,35 @@ import paho.mqtt.client as mqtt
 import MAX6675
 from hx711 import HX711
 
-g_event = 0x00
+#---Parse Data----------------------------------------------------------
+def json_to_val(json_val):
+	payloadData = json.loads(json_val)
+
+	if (len(payloadData) == 1):
+		val = payloadData['val']
+		return (val)
+	elif (len(payloadData) == 2):
+		val = payloadData['val']
+		val2 = payloadData['val2']
+		return (val, val2)
+	elif (len(payloadData) == 3):
+		val = payloadData['val']
+		val2 = payloadData['val2']
+		val3 = payloadData['val3']
+		return (val, val2, val3)
+
+def val_to_json(val,val2=None):
+	if (val2 != None):
+		json_val = {"val":val,"val2":val2}
+	else:
+		json_val = {"val":val}
+	json_val = json.dumps(json_val)
+
+	return (json_val)
+#-----------------------------------------------------------------------
+
+
+g_res_event = 0x00
 
 RES_TEMPERATURE = 0x01
 RES_WEIGHT = 0x02
@@ -192,31 +220,6 @@ def calc_ref_Unit(reference_weight, cal_set_ref_Unit):
 	return calc_ref_unit
 #-----------------------------------------------------------------------
 
-#---Parse Data----------------------------------------------------------
-def json_to_val(json_val):
-	payloadData = json.loads(json_val)
-
-	if (len(payloadData) == 1):
-		val = payloadData['val']
-		return (val)
-	elif (len(payloadData) == 2):
-		val = payloadData['val']
-		val2 = payloadData['val2']
-		return (val, val2)
-	elif (len(payloadData) == 3):
-		val = payloadData['val']
-		val2 = payloadData['val2']
-		val3 = payloadData['val3']
-		return (val, val2, val3)
-
-def val_to_json(val,val2=None):
-	if (val2 != None):
-		json_val = {"val":val,"val2":val2}
-	else:
-		json_val = {"val":val}
-	json_val = json.dumps(json_val)
-
-	return (json_val)
 
 #---MQTT----------------------------------------------------------------
 def on_connect(client,userdata,flags, rc):
@@ -241,46 +244,47 @@ def func_set_q(f_msg):
 
 
 def on_message(client, userdata, _msg):
+    global g_res_event
     global g_res_internal_temp
     global g_res_weight
     global g_res_zero_point
     global g_res_calc_factor
     global g_set_zero_point
 
-   	global req_zero_ref_weight
-   	global referenceUnit
-   	global correlation_value
-   	global loadcell_corr_val
-   	referenceUnit = 1
-   	correlation_value = loadcell_corr_val
+    global req_zero_ref_weight
+    global referenceUnit
+    global correlation_value
+    global loadcell_corr_val
+    referenceUnit = 1
+    correlation_value = loadcell_corr_val
 
     if _msg.topic == '/req_internal_temp':
         g_res_internal_temp = get_temp()
-        g_event |= RES_TEMPERATURE
+        g_res_event |= RES_TEMPERATURE
 
     elif _msg.topic == '/req_zero_point':
         data = _msg.payload.decode('utf-8').replace("'", '"')
         req_zero_reference_weight = json.loads(data)
         req_zero_ref_weight = req_zero_reference_weight['val']
         g_res_zero_point = ref_weight(req_zero_ref_weight)
-        g_event |= RES_ZERO_POINT
+        g_res_event |= RES_ZERO_POINT
 
     elif _msg.topic == '/req_calc_factor':
         g_res_calc_factor = calc_ref_Unit(req_zero_ref_weight, referenceUnit)
-        g_event |= RES_CALC_FACTOR
+        g_res_event |= RES_CALC_FACTOR
 
     elif _msg.topic == '/req_weight':
         g_res_weight = get_loadcell()
-        g_event |= RES_WEIGHT
+        g_res_event |= RES_WEIGHT
 
     elif _msg.topic == '/set_zero_point':
         referenceUnit, set_corr_val = json_to_val(data)
         g_set_zero_point = float(referenceUnit)
         correlation_value = float(set_corr_val)
-        g_event |= SET_ZERO_POINT
+        g_res_event |= SET_ZERO_POINT
 
 
-	func_set_q(_msg)
+    func_set_q(_msg)
 #-----------------------------------------------------------------------
 
 #=======================================================================
@@ -328,6 +332,7 @@ def core_func():
 	# referenceUnit = 1
 	# correlation_value = 200
 
+	global g_res_event
 	global g_res_internal_temp
 	global g_res_weight
 	global g_res_zero_point
@@ -342,33 +347,32 @@ def core_func():
 	correlation_value = loadcell_corr_val
 
 	while True:
+		if g_res_event & RES_TEMPERATURE:
+			g_res_event &= (~RES_TEMPERATURE)
+			dry_client.publish("/res_internal_temp", g_res_internal_temp)
 
-        if g_event & RES_TEMPERATURE:
-            g_event &= (~RES_TEMPERATURE)
-            dry_client.publish("/res_internal_temp", g_res_internal_temp)
+		elif g_res_event & RES_ZERO_POINT:
+			g_res_event &= (~RES_ZERO_POINT)
+			dry_client.publish("/res_zero_point", g_res_zero_point)
 
-        elif g_event & RES_ZERO_POINT:
-            g_event &= (~RES_ZERO_POINT)
-            dry_client.publish("/res_zero_point", g_res_zero_point)
+		elif g_res_event & RES_CALC_FACTOR:
+			g_res_event &= (~RES_CALC_FACTOR)
+			dry_client.publish("/res_calc_factor", g_res_calc_factor)
 
-        elif g_event & RES_CALC_FACTOR:
-            g_event &= (~RES_CALC_FACTOR)
-            dry_client.publish("/res_calc_factor", g_res_calc_factor)
+		elif g_res_event & RES_WEIGHT:
+			g_res_event &= (~RES_WEIGHT)
+			dry_client.publish("/res_weight", g_res_weight)
 
-        elif g_event & RES_WEIGHT:
-            g_event &= (~RES_WEIGHT)
-            dry_client.publish("/res_weight", g_res_weight)
-
-        elif g_event & SET_ZERO_POINT:
-            g_event &= (~SET_ZERO_POINT)
-            set_factor(g_set_zero_point)
+		elif g_res_event & SET_ZERO_POINT:
+			g_res_event &= (~SET_ZERO_POINT)
+			set_factor(g_set_zero_point)
 
 		# mqtt_dequeue()
-	if not q.empty():
-		try:
-			recv_msg = q.get_nowait()
-			g_recv_topic = recv_msg.topic
-			# print(g_recv_topic)
+		if not q.empty():
+			try:
+				recv_msg = q.get_nowait()
+				g_recv_topic = recv_msg.topic
+				# print(g_recv_topic)
 
 			# if (g_recv_topic == '/req_internal_temp'):
 				#print("topic: ", g_recv_topic)
@@ -405,9 +409,9 @@ def core_func():
 				#print ('set_zero_point: ', referenceUnit, ' ', correlation_value)
 				# set_factor(referenceUnit)
 
-		except queue.Empty:
-			pass
-		q.task_done()
+			except queue.Empty:
+				pass
+			q.task_done()
 
 if __name__ == "__main__":
 	print("Start exec_res.py...")
