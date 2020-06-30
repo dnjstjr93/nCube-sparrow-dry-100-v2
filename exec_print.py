@@ -516,10 +516,7 @@ def core_func():
 	global g_print_corr_val
 	global g_print_elapsed_time
 
-	period = 10000
-	while_count = 0
 	while True:
-		while_count = while_count + 1
 		mqtt_dequeue()
 		if g_print_event & LCD_DEBUG:
 			g_print_event &= (~LCD_DEBUG)
