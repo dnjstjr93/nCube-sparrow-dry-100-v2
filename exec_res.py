@@ -194,6 +194,9 @@ Calculate the weight of the reference weight minus the case weight and
 divide by the reference weight to get the factor.
 (Variable : get_factor)
 
+Apply get_factor to get the weight and subtract the reference weight to
+calculate correlation value.
+correlation value is a variable for precisely calculating the weight.
 (Variable : get_correlation_value)
 '''
 def calc_ref_Unit(reference_weight, default_Unit=1):
