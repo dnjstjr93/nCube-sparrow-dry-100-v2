@@ -375,9 +375,9 @@ def core_func():
 
 		elif g_res_event & SET_ZERO_POINT:
 			g_res_event &= (~SET_ZERO_POINT)
-			referenceUnit, set_corr_val = json_to_val(data)
-			g_set_zero_point = float(referenceUnit)
-			get_correlation_value = float(set_corr_val)
+			#referenceUnit, set_corr_val = json_to_val(data)
+			#g_set_zero_point = float(referenceUnit)
+			#get_correlation_value = float(set_corr_val)
 			set_factor(g_set_zero_point)
 			
 
