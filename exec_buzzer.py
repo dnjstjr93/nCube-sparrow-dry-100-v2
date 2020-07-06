@@ -1,4 +1,4 @@
-import json, queue, time
+import json, time
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
@@ -7,8 +7,6 @@ g_buzzer_event = 0x00
 SET_BUZZER = 0x01
 
 g_set_buzzer_val = 0
-
-q = queue.Queue()
 
 #---SET Pin-------------------------------------------------------------
 Buzzer_pin = 11 # Direct Connect
@@ -84,10 +82,6 @@ def on_subscribe(client, userdata, mid, granted_qos):
 	print("subscribed: " + str(mid) + " " + str(granted_qos))
 
 
-def func_set_q(f_msg):
-	q.put_nowait(f_msg)
-
-
 def on_message(client, userdata, _msg):
 	global g_buzzer_event
 	global g_set_buzzer_val
@@ -98,7 +92,7 @@ def on_message(client, userdata, _msg):
 		g_set_buzzer_val = json_to_val(data)
 		g_buzzer_event |= SET_BUZZER
 
-	func_set_q(_msg)
+#	func_set_q(_msg)
 #-----------------------------------------------------------------------
 
 #=======================================================================
@@ -117,26 +111,6 @@ dry_client.subscribe("/set_buzzer")
 
 dry_client.loop_start()
 
-
-def mqtt_dequeue():
-	if not q.empty():
-		try:
-			recv_msg = q.get(False)
-			g_recv_topic = recv_msg.topic
-			# print(g_recv_topic)
-
-# 			if (g_recv_topic == '/set_buzzer'):
-# 				#print("topic: ", g_recv_topic)
-# 				buzzer_running = 1
-# 				data = recv_msg.payload.decode('utf-8').replace("'", '"')
-# 				buzzer_val = json_to_val(data)
-# 				buzzer(buzzer_val)
-# 				buzzer_running = 0
-
-		except queue.Empty:
-			pass
-		q.task_done()
-
 def core_func():
 	global g_buzzer_event
 	global g_set_buzzer_val
@@ -145,8 +119,6 @@ def core_func():
 		if g_buzzer_event & SET_BUZZER:
 			g_buzzer_event &= (~SET_BUZZER)
 			buzzer(g_set_buzzer_val)
-
-		mqtt_dequeue()
 
 if __name__ == "__main__":
 	print("Start exec_buzzer.py...")

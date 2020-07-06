@@ -1,4 +1,4 @@
-import sys, os, time, json, queue
+import sys, os, time, json
 import datetime
 import board, busio
 import paho.mqtt.client as mqtt
@@ -31,8 +31,6 @@ g_print_target_loadcell = ''
 g_print_loadcell_factor = 0
 g_print_corr_val = 0
 g_print_elapsed_time = ''
-
-q = queue.Queue()
 
 #---SET Pin-------------------------------------------------------------
 # LCD I2C 
@@ -76,10 +74,6 @@ def on_disconnect(client, userdata, flags, rc=0):
 
 def on_subscribe(client, userdata, mid, granted_qos):
 	print("subscribed: " + str(mid) + " " + str(granted_qos))
-
-
-def func_set_q(f_msg):
-	q.put_nowait(f_msg)
 
 
 def on_message(client, userdata, _msg):
@@ -146,9 +140,6 @@ def on_message(client, userdata, _msg):
 		g_print_elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
 		g_print_event_2 |= LCD_ELAPSED_TIME
 
-
-	func_set_q(_msg)
-	
 #-----------------------------------------------------------------------
 
 #---INIT LCD & Display Message------------------------------------------
@@ -418,88 +409,6 @@ dry_client.subscribe("/print_lcd_safe_door")
 
 dry_client.loop_start()
 
-def mqtt_dequeue():
-	if not q.empty():
-		try:
-			recv_msg = q.get(False)
-			g_recv_topic = recv_msg.topic
-			# print(g_recv_topic)
-
-			# if (g_recv_topic == '/print_lcd_internal_temp'):
-				# print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# top, bottom = json_to_val(data)
-				# print ('print_lcd: ', top, ' ', bottom)
-				# displayTemp(top, bottom)
-
-			# elif (g_recv_topic == '/print_lcd_state'):
-				#print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# state = json_to_val(data)
-				# displayState(state)
-				# print('print_lcd_state')
-
-			# elif (g_recv_topic == '/print_lcd_debug_message'):
-				# #print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# debug = json_to_val(data)
-				# #print (debug)
-				# displayMsg(debug)
-				# # print('print_lcd_debug_message')
-
-			# elif (g_recv_topic == '/print_lcd_loadcell'):
-				#print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# loadcell, target_loadcell = json_to_val(data)
-				# loadcell = str(loadcell)
-				#print(loadcell, ' ', target_loadcell)
-				# target_loadcell = str(target_loadcell)
-				#loadcell = (loadcell[2:(len(loadcell)-5)])
-				#target_loadcell = (target_loadcell[2:(len(target_loadcell)-5)])
-				# displayLoadcell(loadcell, target_loadcell)
-
-			# elif (g_recv_topic == '/print_lcd_loadcell_factor'):
-				#print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# loadcell_factor, corr_val = json_to_val(data)
-				# displayLoadcellFactor(loadcell_factor)
-
-			# elif (g_recv_topic == '/print_lcd_input_door'):
-				# #print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# print('input_door:', data)
-				# input_door = json_to_val(data)
-				# print('input_door:', input_door)
-				# displayInputDoor(input_door)
-
-			# elif (g_recv_topic == '/print_lcd_output_door'):
-				# #print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# print('output:', data)
-				# output_door = json_to_val(data)
-				# print('output_door:', output_door)
-				# displayOutputDoor(output_door)
-				# # print('print_lcd_output_door')
-
-			# elif (g_recv_topic == '/print_lcd_safe_door'):
-				# #print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# print('safe_door:', data)
-				# val_safe_door = json_to_val(data)
-				# print('safe_door:', val_safe_door)
-				# displaySafeDoor(val_safe_door)
-
-			# elif (g_recv_topic == '/print_lcd_elapsed_time'):
-				#print("topic: ", g_recv_topic)
-				# data = recv_msg.payload.decode('utf-8').replace("'", '"')
-				# elapsed_time = json_to_val(data)
-				# elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
-				# displayElapsed(elapsed_time)
-
-		except queue.Empty:
-			pass
-		q.task_done()
-
 def core_func():
 	global g_print_event
 	global g_print_event_2
@@ -517,7 +426,6 @@ def core_func():
 	global g_print_elapsed_time
 
 	while True:
-		mqtt_dequeue()
 		if g_print_event & LCD_DEBUG:
 			g_print_event &= (~LCD_DEBUG)
 			displayMsg(g_print_debug)
