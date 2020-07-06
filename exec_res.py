@@ -17,7 +17,9 @@ g_res_zero_point = {}
 g_res_calc_factor = {}
 g_set_zero_point = 0.0
 get_correlation_value = 0.0
-
+data = {}
+loadcell_factor = 0.0
+loadcell_corr_val = 0.0
 # global arr_count
 arr_count = 5
 # global bottom_temp_arr, top_temp_arr
@@ -165,7 +167,6 @@ def get_loadcell():
 
 def ref_weight(tare_weight):
 	global avg_zero_weight
-	global g_set_zero_point
 
 	val = val_to_json(1)
 
@@ -180,7 +181,7 @@ def ref_weight(tare_weight):
 	print("ref_weight - avg_zero_weight: ", avg_zero_weight)
 
 	print("Add weight for initialize...")
-	set_factor(g_set_zero_point)
+
 	return val
 
 
@@ -232,7 +233,27 @@ def calc_ref_Unit(reference_weight, cal_set_ref_Unit):
 	return calc_ref_unit
 #-----------------------------------------------------------------------
 
+def save_factor():
+	global loadcell_factor
+	global loadcell_corr_val
+	
+	loadcell_param = {"factor":6555,"correlation_value":200}
 
+	if (os. path.isfile("./factor.json") == False):
+		with open("./factor.json","w") as refUnit_json:
+			json.dump(loadcell_param, refUnit_json)
+		loadcell_factor = loadcell_param['factor']
+		loadcell_corr_val = loadcell_param['correlation_value']
+	else:
+		refUnit_json = open("./factor.json").read()
+		data = json.loads(refUnit_json)
+	
+		loadcell_factor = data['factor']
+		loadcell_corr_val = data['correlation_value']
+	print("save_factor:", loadcell_factor,", ", loadcell_corr_val)
+	return loadcell_factor, loadcell_corr_val
+	
+	
 #---MQTT----------------------------------------------------------------
 def on_connect(client,userdata,flags, rc):
 	print('[dry_mqtt_connect] connect to ', broker_address)
@@ -264,7 +285,9 @@ def on_message(client, userdata, _msg):
     global correlation_value
     global loadcell_corr_val
     global get_correlation_value
-    referenceUnit = 1
+    global loadcell_factor
+    global loadcell_corr_val    
+    #referenceUnit = 1
     correlation_value = loadcell_corr_val
 
     if _msg.topic == '/req_internal_temp':
@@ -284,9 +307,15 @@ def on_message(client, userdata, _msg):
         g_res_event |= RES_WEIGHT
 
     elif _msg.topic == '/set_zero_point':
-        referenceUnit, set_corr_val = json_to_val(data)
-        g_set_zero_point = float(referenceUnit)
-        get_correlation_value = float(set_corr_val)
+        print("on_message=======set_zero_point=======")
+        #referenceUnit, set_corr_val = json_to_val(data)      
+        print("referenceUnit: ", loadcell_factor)
+        print("set_corr_val: ", loadcell_corr_val)
+        g_set_zero_point = float(loadcell_factor)
+        get_correlation_value = float(loadcell_corr_val)
+        print("g_set_zero_point: ", g_set_zero_point)
+        print("get_correlation_value: ", get_correlation_value)
+        #set_factor(g_set_zero_point)
         g_res_event |= SET_ZERO_POINT
 
 #-----------------------------------------------------------------------
@@ -305,23 +334,24 @@ dry_client.connect(broker_address, port)
 
 dry_client.loop_start()
 
-global loadcell_factor
-global loadcell_corr_val
+#global loadcell_factor
+#global loadcell_corr_val
 
-loadcell_param = {"factor":6555,"correlation_value":200}
+#loadcell_param = {"factor":6555,"correlation_value":200}
 
-if (os. path.isfile("./factor.json") == False):
-	with open("./factor.json","w") as refUnit_json:
-		json.dump(loadcell_param, refUnit_json)
-	loadcell_factor = loadcell_param['factor']
-	loadcell_corr_val = loadcell_param['correlation_value']
-else:
-	refUnit_json = open("./factor.json").read()
-	data = json.loads(refUnit_json)
+#if (os. path.isfile("./factor.json") == False):
+	#with open("./factor.json","w") as refUnit_json:
+		#json.dump(loadcell_param, refUnit_json)
+	#loadcell_factor = loadcell_param['factor']
+	
+	#loadcell_corr_val = loadcell_param['correlation_value']
+#else:
+	#refUnit_json = open("./factor.json").read()
+	#data = json.loads(refUnit_json)
 
-	loadcell_factor = data['factor']
-	loadcell_corr_val = data['correlation_value']
-
+	#loadcell_factor = data['factor']
+	#loadcell_corr_val = data['correlation_value']
+loadcell_factor, loadcell_corr_val = save_factor()
 init_loadcell(loadcell_factor)
 
 # weight_arr = [0, 0, 0, 0, 0]
@@ -348,7 +378,8 @@ def core_func():
 	global correlation_value
 	global loadcell_corr_val
 	global get_correlation_value
-	
+	global data
+
 	referenceUnit = 1
 	#correlation_value = loadcell_corr_val
 
@@ -378,7 +409,10 @@ def core_func():
 
 		elif g_res_event & SET_ZERO_POINT:
 			g_res_event &= (~SET_ZERO_POINT)
+			print("=======set_zero_point=======")
 			#referenceUnit, set_corr_val = json_to_val(data)
+			#print(data)
+			#print(referenceUnit,", ", set_corr_val)
 			#g_set_zero_point = float(referenceUnit)
 			#get_correlation_value = float(set_corr_val)
 			set_factor(g_set_zero_point)
