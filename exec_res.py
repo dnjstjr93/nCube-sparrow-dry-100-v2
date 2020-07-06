@@ -98,9 +98,9 @@ def get_temp():
 	avg_bottom_temp = round((sum(bottom_temp_arr) / arr_count), 1)
 	avg_top_temp = round((sum(top_temp_arr) / arr_count), 1)
 
-	temperature1 = val_to_json(avg_top_temp, avg_bottom_temp)
+	temperature = val_to_json(avg_top_temp, avg_bottom_temp)
 
-	return (temperature1)
+	return (temperature)
 
 #---SET Load Cell & GET Weight------------------------------------------
 def cleanAndExit():
@@ -124,9 +124,7 @@ def init_loadcell(referenceUnit = 1):
 
 def set_factor(referenceUnit):
 	print('set_factor: ', referenceUnit)
-	hx.set_reference_unit(referenceUnit)
-	hx.reset()
-
+	init_loadcell(referenceUnit)
 
 def get_loadcell():
 	global hx
@@ -150,13 +148,13 @@ def get_loadcell():
 				weight_arr[arr_count-1] = weight
 
 		avg_weight = round((sum(weight_arr) / arr_count), 1)
-		print("===Correlation_Value: ", get_correlation_value)
 		final_weight = avg_weight - get_correlation_value
 		final_weight = max(0, float(final_weight))
-		print('weight_arr: ', weight_arr)
-		print('get_loadcell - correlation_value: ', get_correlation_value)
-		print('get_loadcell - avg_weight: ', avg_weight)
-		print('get_loadcell - final_weight: ', final_weight)
+		print("GET : weight_arr: ",weight_arr)
+		print("GET : avg_weight: ",avg_weight)
+		print("GET : get_factor: ",get_factor)
+		print("GET : get_correlation_value: ",get_correlation_value)
+		print("GET : final_weight: ",final_weight)
 		weight_json = val_to_json(final_weight)
 
 	except (KeyboardInterrupt, SystemExit):
@@ -253,13 +251,13 @@ def save_factor():
 	global get_factor
 	global get_correlation_value
 	
-	loadcell_param = {"factor":6555,"correlation_value":200}
+	loadcell_param = {"factor":6555,"correlation_value":0.1}
 
 	if (os. path.isfile("./factor.json") == False):
 		with open("./factor.json","w") as refUnit_json:
 			json.dump(loadcell_param, refUnit_json)
-		loadcell_factor = loadcell_param['factor']
-		loadcell_corr_val = loadcell_param['correlation_value']
+		get_factor = loadcell_param['factor']
+		get_correlation_value = loadcell_param['correlation_value']
 	else:
 		refUnit_json = open("./factor.json").read()
 		data = json.loads(refUnit_json)
@@ -267,6 +265,7 @@ def save_factor():
 		get_factor = data['factor']
 		get_correlation_value = data['correlation_value']
 	print("save_factor:", get_factor,", ", get_correlation_value)
+	
 	return get_factor, get_correlation_value
 	
 	
