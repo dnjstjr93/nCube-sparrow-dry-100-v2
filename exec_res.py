@@ -269,6 +269,9 @@ def on_message(client, userdata, _msg):
         g_res_event |= RES_TEMPERATURE
 
     elif _msg.topic == '/req_zero_point':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        req_zero_reference_weight = json.loads(data)
+        req_zero_ref_weight = req_zero_reference_weight['val']
         g_res_event |= RES_ZERO_POINT
 
     elif _msg.topic == '/req_calc_factor':
@@ -278,6 +281,9 @@ def on_message(client, userdata, _msg):
         g_res_event |= RES_WEIGHT
 
     elif _msg.topic == '/set_zero_point':
+        referenceUnit, set_corr_val = json_to_val(data)
+        g_set_zero_point = float(referenceUnit)
+        get_correlation_value = float(set_corr_val)
         g_res_event |= SET_ZERO_POINT
 
 #-----------------------------------------------------------------------
@@ -338,6 +344,8 @@ def core_func():
 	global referenceUnit
 	global correlation_value
 	global loadcell_corr_val
+	global get_correlation_value
+	
 	referenceUnit = 1
 	#correlation_value = loadcell_corr_val
 
@@ -349,9 +357,9 @@ def core_func():
 
 		elif g_res_event & RES_ZERO_POINT:
 			g_res_event &= (~RES_ZERO_POINT)
-			data = _msg.payload.decode('utf-8').replace("'", '"')
-			req_zero_reference_weight = json.loads(data)
-			req_zero_ref_weight = req_zero_reference_weight['val']
+			#data = _msg.payload.decode('utf-8').replace("'", '"')
+			#req_zero_reference_weight = json.loads(data)
+			#req_zero_ref_weight = req_zero_reference_weight['val']
 			g_res_zero_point = ref_weight(req_zero_ref_weight)
 			dry_client.publish("/res_zero_point", g_res_zero_point)
 
