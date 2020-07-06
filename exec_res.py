@@ -215,7 +215,7 @@ def calc_ref_Unit(reference_weight, default_Unit=1):
 	print('calc_ref_Unit : avg_ref_weight: ', ref_weight_total)
 	cur_weight = (ref_weight_total - zero_weight)
 	get_factor = (cur_weight / reference_weight)
-	print('calc_ref_Unit : cur_weight: ', cur_weight)
+	print('calc_ref_Unit : cur_weight = {} - {} = {}'.format(ref_weight_total, zero_weight, cur_weight))
 	print('calc_ref_Unit : get_factor = {} / {} = {}'.format(cur_weight, reference_weight, get_factor))
 	#print('calc_ref_Unit : get_factor: ', get_factor)
 
