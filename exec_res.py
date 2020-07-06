@@ -165,6 +165,7 @@ def get_loadcell():
 
 def ref_weight(tare_weight):
 	global avg_zero_weight
+	global g_set_zero_point
 
 	val = val_to_json(1)
 
@@ -179,7 +180,7 @@ def ref_weight(tare_weight):
 	print("ref_weight - avg_zero_weight: ", avg_zero_weight)
 
 	print("Add weight for initialize...")
-
+	set_factor(g_set_zero_point)
 	return val
 
 
@@ -276,7 +277,7 @@ def on_message(client, userdata, _msg):
         g_res_event |= RES_ZERO_POINT
 
     elif _msg.topic == '/req_calc_factor':
-        set_factor(g_set_zero_point)
+        #set_factor(g_set_zero_point)
         g_res_event |= RES_CALC_FACTOR
 
     elif _msg.topic == '/req_weight':
