@@ -16,6 +16,7 @@ g_res_weight = {}
 g_res_zero_point = {}
 g_res_calc_factor = {}
 g_set_zero_point = 0.0
+get_correlation_value = 0.0
 
 # global arr_count
 arr_count = 5
@@ -28,7 +29,7 @@ avg_top_temp = 0.0
 nWeightCount = 1
 weight_arr = [0, 0, 0, 0, 0]
 flag = 0
-get_correlation_value = 0.0
+# get_correlation_value = 0.0
 
 #---Parse Data----------------------------------------------------------
 def json_to_val(json_val):
@@ -275,6 +276,7 @@ def on_message(client, userdata, _msg):
         g_res_event |= RES_ZERO_POINT
 
     elif _msg.topic == '/req_calc_factor':
+        set_factor(g_set_zero_point)
         g_res_event |= RES_CALC_FACTOR
 
     elif _msg.topic == '/req_weight':
