@@ -66,7 +66,15 @@ def val_to_json(val,val2=None):
 #---MQTT----------------------------------------------------------------
 def on_connect(client,userdata,flags, rc):
 	print('[dry_mqtt_connect] connect to ', broker_address)
-
+	dry_client.subscribe("/print_lcd_internal_temp")
+	dry_client.subscribe("/print_lcd_state")
+	dry_client.subscribe("/print_lcd_debug_message")
+	dry_client.subscribe("/print_lcd_loadcell")
+	dry_client.subscribe("/print_lcd_loadcell_factor")
+	dry_client.subscribe("/print_lcd_elapsed_time")
+	dry_client.subscribe("/print_lcd_input_door")
+	dry_client.subscribe("/print_lcd_output_door")
+	dry_client.subscribe("/print_lcd_safe_door")
 
 def on_disconnect(client, userdata, flags, rc=0):
 	print(str(rc))
@@ -397,15 +405,15 @@ dry_client.on_subscribe = on_subscribe
 dry_client.on_message = on_message
 dry_client.connect(broker_address, port)
 
-dry_client.subscribe("/print_lcd_internal_temp")
-dry_client.subscribe("/print_lcd_state")
-dry_client.subscribe("/print_lcd_debug_message")
-dry_client.subscribe("/print_lcd_loadcell")
-dry_client.subscribe("/print_lcd_loadcell_factor")
-dry_client.subscribe("/print_lcd_elapsed_time")
-dry_client.subscribe("/print_lcd_input_door")
-dry_client.subscribe("/print_lcd_output_door")
-dry_client.subscribe("/print_lcd_safe_door")
+# dry_client.subscribe("/print_lcd_internal_temp")
+# dry_client.subscribe("/print_lcd_state")
+# dry_client.subscribe("/print_lcd_debug_message")
+# dry_client.subscribe("/print_lcd_loadcell")
+# dry_client.subscribe("/print_lcd_loadcell_factor")
+# dry_client.subscribe("/print_lcd_elapsed_time")
+# dry_client.subscribe("/print_lcd_input_door")
+# dry_client.subscribe("/print_lcd_output_door")
+# dry_client.subscribe("/print_lcd_safe_door")
 
 dry_client.loop_start()
 
