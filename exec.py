@@ -28,25 +28,25 @@ SET_CRUSHER = 0x10
 SET_CLEANING_PUMP = 0x20
 
 
-g_buzzer_event = 0x00
-
-SET_BUZZER = 0x01
-
-
-g_print_event = 0x00
-
-LCD_DEBUG = 0x01
-LCD_INPUT_DOOR = 0x02
-LCD_OUTPUT_DOOR = 0x04
-LCD_SAFE_DOOR = 0x08
-LCD_TEMPERATURE = 0X10
-LCD_STATE = 0x20
-LCD_LOADCELL = 0x40
-LCD_LOADCELL_FACTOR = 0x80
-
-g_print_event_2 = 0x00
-
-LCD_ELAPSED_TIME = 0x01
+# g_buzzer_event = 0x00
+#
+# SET_BUZZER = 0x01
+#
+#
+# g_print_event = 0x00
+#
+# LCD_DEBUG = 0x01
+# LCD_INPUT_DOOR = 0x02
+# LCD_OUTPUT_DOOR = 0x04
+# LCD_SAFE_DOOR = 0x08
+# LCD_TEMPERATURE = 0X10
+# LCD_STATE = 0x20
+# LCD_LOADCELL = 0x40
+# LCD_LOADCELL_FACTOR = 0x80
+#
+# g_print_event_2 = 0x00
+#
+# LCD_ELAPSED_TIME = 0x01
 
 
 g_res_internal_temp = {}
@@ -62,20 +62,20 @@ g_set_lift_val = {}
 g_set_crusher_val = {}
 g_set_cleaning_pump_val = {}
 
-g_set_buzzer_val = 0
-
-g_print_debug = ''
-g_print_input_door = 0
-g_print_output_door = 0
-g_print_safe_door = 0
-g_print_internal_temp = 0
-g_print_external_temp = 0
-g_print_state = ''
-g_print_loadcell = ''
-g_print_target_loadcell = ''
-g_print_loadcell_factor = 0
-g_print_corr_val = 0
-g_print_elapsed_time = ''
+# g_set_buzzer_val = 0
+#
+# g_print_debug = ''
+# g_print_input_door = 0
+# g_print_output_door = 0
+# g_print_safe_door = 0
+# g_print_internal_temp = 0
+# g_print_external_temp = 0
+# g_print_state = ''
+# g_print_loadcell = ''
+# g_print_target_loadcell = ''
+# g_print_loadcell_factor = 0
+# g_print_corr_val = 0
+# g_print_elapsed_time = ''
 
 '''
 heater temperature = top_temp = internal_temp
@@ -167,20 +167,20 @@ Circulator_pin = 13
 Cooling_Fan_pin = 13
 Pump_pin = 13
 
-# LCD I2C
-SDA = 38 # SDA_LCD-DAT
-SCL = 16 # SCL_LCD-CLK
-
 #---SET SX1509----------------------------------------------------------
 addr = 0x3e
 sx = SX1509.SX1509(addr)
 ctl = Control.Control(sx)
 
-# Buzzer
-Buzzer_pin = 11 # Direct Connect
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(Buzzer_pin, GPIO.OUT)
+# #---Buzzer--------------------------------------------------------------
+# Buzzer_pin = 11 # Direct Connect
+#
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(Buzzer_pin, GPIO.OUT)
+#
+# #---LCD I2C-------------------------------------------------------------
+# SDA = 38 # SDA_LCD-DAT
+# SCL = 16 # SCL_LCD-CLK
 #=======================================================================
 
 #---GET Temperature-----------------------------------------------------
@@ -404,7 +404,7 @@ def cleaning_pump(val):
 	ctl.DOUT(Cleaning_Pump_pin,val)
 #=======================================================================
 
-
+'''
 #---Buzzer--------------------------------------------------------------
 def buzzer(val):
 	freq = [1936, 2094, 1760]#[988, 1047, 880]
@@ -664,7 +664,7 @@ def displayMsg(msg1):
 		g_lcd.cursor_position(0,3)
 		g_lcd.message = f'{msg1}'
 #-----------------------------------------------------------------------
-
+'''
 
 #---MQTT----------------------------------------------------------------
 def on_connect(client,userdata,flags, rc):
@@ -719,23 +719,23 @@ def on_message(client, userdata, _msg):
     global g_set_crusher_val
     global g_set_cleaning_pump_val
     
-    global g_buzzer_event
-    global g_set_buzzer_val
-
-    global g_print_event
-    global g_print_event_2
-    global g_print_debug
-    global g_print_input_door
-    global g_print_output_door
-    global g_print_safe_door
-    global g_print_internal_temp
-    global g_print_external_temp
-    global g_print_state
-    global g_print_loadcell
-    global g_print_target_loadcell
-    global g_print_loadcell_factor
-    global g_print_corr_val
-    global g_print_elapsed_time
+#     global g_buzzer_event
+#     global g_set_buzzer_val
+#
+#     global g_print_event
+#     global g_print_event_2
+#     global g_print_debug
+#     global g_print_input_door
+#     global g_print_output_door
+#     global g_print_safe_door
+#     global g_print_internal_temp
+#     global g_print_external_temp
+#     global g_print_state
+#     global g_print_loadcell
+#     global g_print_target_loadcell
+#     global g_print_loadcell_factor
+#     global g_print_corr_val
+#     global g_print_elapsed_time
 
     correlation_value = loadcell_corr_val
 
@@ -790,59 +790,59 @@ def on_message(client, userdata, _msg):
         g_set_event |= SET_CLEANING_PUMP
 
 
-    if _msg.topic == '/set_buzzer':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_set_buzzer_val = json_to_val(data)
-        g_buzzer_event |= SET_BUZZER
-
-
-    if _msg.topic == '/print_lcd_debug_message':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_debug = json_to_val(data)
-        g_print_event |= LCD_DEBUG
-
-    elif _msg.topic == '/print_lcd_input_door':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_input_door = json_to_val(data)
-        g_print_event |= LCD_INPUT_DOOR
-
-    elif _msg.topic == '/print_lcd_output_door':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_output_door = json_to_val(data)
-        g_print_event |= LCD_OUTPUT_DOOR
-
-    elif _msg.topic == '/print_lcd_safe_door':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_safe_door = json_to_val(data)
-        g_print_event |= LCD_SAFE_DOOR
-
-    elif _msg.topic == '/print_lcd_internal_temp':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_internal_temp, g_print_external_temp = json_to_val(data)
-        g_print_event |= LCD_TEMPERATURE
-
-    elif _msg.topic == '/print_lcd_state':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_state = json_to_val(data)
-        g_print_event |= LCD_STATE
-
-    elif _msg.topic == '/print_lcd_loadcell':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        loadcell, target_loadcell = json_to_val(data)
-        g_print_loadcell = str(loadcell)
-        g_print_target_loadcell = str(target_loadcell)
-        g_print_event |= LCD_LOADCELL
-
-    elif _msg.topic == '/print_lcd_loadcell_factor':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        g_print_loadcell_factor, g_print_corr_val = json_to_val(data)
-        g_print_event |= LCD_LOADCELL_FACTOR
-
-    elif _msg.topic == '/print_lcd_elapsed_time':
-        data = _msg.payload.decode('utf-8').replace("'", '"')
-        elapsed_time = json_to_val(data)
-        g_print_elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
-        g_print_event_2 |= LCD_ELAPSED_TIME
+#     if _msg.topic == '/set_buzzer':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_set_buzzer_val = json_to_val(data)
+#         g_buzzer_event |= SET_BUZZER
+#
+#
+#     if _msg.topic == '/print_lcd_debug_message':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_debug = json_to_val(data)
+#         g_print_event |= LCD_DEBUG
+#
+#     elif _msg.topic == '/print_lcd_input_door':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_input_door = json_to_val(data)
+#         g_print_event |= LCD_INPUT_DOOR
+#
+#     elif _msg.topic == '/print_lcd_output_door':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_output_door = json_to_val(data)
+#         g_print_event |= LCD_OUTPUT_DOOR
+#
+#     elif _msg.topic == '/print_lcd_safe_door':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_safe_door = json_to_val(data)
+#         g_print_event |= LCD_SAFE_DOOR
+#
+#     elif _msg.topic == '/print_lcd_internal_temp':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_internal_temp, g_print_external_temp = json_to_val(data)
+#         g_print_event |= LCD_TEMPERATURE
+#
+#     elif _msg.topic == '/print_lcd_state':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_state = json_to_val(data)
+#         g_print_event |= LCD_STATE
+#
+#     elif _msg.topic == '/print_lcd_loadcell':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         loadcell, target_loadcell = json_to_val(data)
+#         g_print_loadcell = str(loadcell)
+#         g_print_target_loadcell = str(target_loadcell)
+#         g_print_event |= LCD_LOADCELL
+#
+#     elif _msg.topic == '/print_lcd_loadcell_factor':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         g_print_loadcell_factor, g_print_corr_val = json_to_val(data)
+#         g_print_event |= LCD_LOADCELL_FACTOR
+#
+#     elif _msg.topic == '/print_lcd_elapsed_time':
+#         data = _msg.payload.decode('utf-8').replace("'", '"')
+#         elapsed_time = json_to_val(data)
+#         g_print_elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+#         g_print_event_2 |= LCD_ELAPSED_TIME
 
 #-----------------------------------------------------------------------
 
@@ -858,16 +858,16 @@ dry_client.on_subscribe = on_subscribe
 dry_client.on_message = on_message
 dry_client.connect(broker_address, port)
 
-dry_client.subscribe("/set_buzzer")
-dry_client.subscribe("/print_lcd_internal_temp")
-dry_client.subscribe("/print_lcd_state")
-dry_client.subscribe("/print_lcd_debug_message")
-dry_client.subscribe("/print_lcd_loadcell")
-dry_client.subscribe("/print_lcd_loadcell_factor")
-dry_client.subscribe("/print_lcd_elapsed_time")
-dry_client.subscribe("/print_lcd_input_door")
-dry_client.subscribe("/print_lcd_output_door")
-dry_client.subscribe("/print_lcd_safe_door")
+# dry_client.subscribe("/set_buzzer")
+# dry_client.subscribe("/print_lcd_internal_temp")
+# dry_client.subscribe("/print_lcd_state")
+# dry_client.subscribe("/print_lcd_debug_message")
+# dry_client.subscribe("/print_lcd_loadcell")
+# dry_client.subscribe("/print_lcd_loadcell_factor")
+# dry_client.subscribe("/print_lcd_elapsed_time")
+# dry_client.subscribe("/print_lcd_input_door")
+# dry_client.subscribe("/print_lcd_output_door")
+# dry_client.subscribe("/print_lcd_safe_door")
 
 dry_client.loop_start()
 
@@ -902,23 +902,23 @@ def core_func():
 	global g_set_crusher_val
 	global g_set_cleaning_pump_val
 
-	global g_buzzer_event
-	global g_set_buzzer_val
-
-	global g_print_event
-	global g_print_event_2
-	global g_print_debug
-	global g_print_input_door
-	global g_print_output_door
-	global g_print_safe_door
-	global g_print_internal_temp
-	global g_print_external_temp
-	global g_print_state
-	global g_print_loadcell
-	global g_print_target_loadcell
-	global g_print_loadcell_factor
-	global g_print_corr_val
-	global g_print_elapsed_time
+# 	global g_buzzer_event
+# 	global g_set_buzzer_val
+#
+# 	global g_print_event
+# 	global g_print_event_2
+# 	global g_print_debug
+# 	global g_print_input_door
+# 	global g_print_output_door
+# 	global g_print_safe_door
+# 	global g_print_internal_temp
+# 	global g_print_external_temp
+# 	global g_print_state
+# 	global g_print_loadcell
+# 	global g_print_target_loadcell
+# 	global g_print_loadcell_factor
+# 	global g_print_corr_val
+# 	global g_print_elapsed_time
 
 	while True:
 		if g_res_event & RES_TEMPERATURE:
@@ -966,46 +966,46 @@ def core_func():
 			cleaning_pump(g_set_cleaning_pump_val)
 
 
-		if g_buzzer_event & SET_BUZZER:
-			g_buzzer_event &= (~SET_BUZZER)
-			buzzer(g_set_buzzer_val)
-
-
-		if g_print_event & LCD_DEBUG:
-			g_print_event &= (~LCD_DEBUG)
-			displayMsg(g_print_debug)
-
-		elif g_print_event & LCD_INPUT_DOOR:
-			g_print_event &= (~LCD_INPUT_DOOR)
-			displayInputDoor(g_print_input_door)
-
-		elif g_print_event & LCD_OUTPUT_DOOR:
-			g_print_event &= (~LCD_OUTPUT_DOOR)
-			displayOutputDoor(g_print_output_door)
-
-		elif g_print_event & LCD_SAFE_DOOR:
-			g_print_event &= (~LCD_SAFE_DOOR)
-			displaySafeDoor(g_print_safe_door)
-
-		elif g_print_event & LCD_TEMPERATURE:
-			g_print_event &= (~LCD_TEMPERATURE)
-			displayTemp(g_print_internal_temp, g_print_external_temp)
-
-		elif g_print_event & LCD_STATE:
-			g_print_event &= (~LCD_STATE)
-			displayState(g_print_state)
-
-		elif g_print_event & LCD_LOADCELL:
-			g_print_event &= (~LCD_LOADCELL)
-			displayLoadcell(g_print_loadcell, g_print_target_loadcell)
-
-		elif g_print_event & LCD_LOADCELL_FACTOR:
-			g_print_event &= (~LCD_LOADCELL_FACTOR)
-			displayLoadcellFactor(g_print_loadcell_factor)
-
-		elif g_print_event_2 & LCD_ELAPSED_TIME:
-			g_print_event_2 &= (~LCD_ELAPSED_TIME)
-			displayElapsed(g_print_elapsed_time)
+# 		if g_buzzer_event & SET_BUZZER:
+# 			g_buzzer_event &= (~SET_BUZZER)
+# 			buzzer(g_set_buzzer_val)
+#
+#
+# 		if g_print_event & LCD_DEBUG:
+# 			g_print_event &= (~LCD_DEBUG)
+# 			displayMsg(g_print_debug)
+#
+# 		elif g_print_event & LCD_INPUT_DOOR:
+# 			g_print_event &= (~LCD_INPUT_DOOR)
+# 			displayInputDoor(g_print_input_door)
+#
+# 		elif g_print_event & LCD_OUTPUT_DOOR:
+# 			g_print_event &= (~LCD_OUTPUT_DOOR)
+# 			displayOutputDoor(g_print_output_door)
+#
+# 		elif g_print_event & LCD_SAFE_DOOR:
+# 			g_print_event &= (~LCD_SAFE_DOOR)
+# 			displaySafeDoor(g_print_safe_door)
+#
+# 		elif g_print_event & LCD_TEMPERATURE:
+# 			g_print_event &= (~LCD_TEMPERATURE)
+# 			displayTemp(g_print_internal_temp, g_print_external_temp)
+#
+# 		elif g_print_event & LCD_STATE:
+# 			g_print_event &= (~LCD_STATE)
+# 			displayState(g_print_state)
+#
+# 		elif g_print_event & LCD_LOADCELL:
+# 			g_print_event &= (~LCD_LOADCELL)
+# 			displayLoadcell(g_print_loadcell, g_print_target_loadcell)
+#
+# 		elif g_print_event & LCD_LOADCELL_FACTOR:
+# 			g_print_event &= (~LCD_LOADCELL_FACTOR)
+# 			displayLoadcellFactor(g_print_loadcell_factor)
+#
+# 		elif g_print_event_2 & LCD_ELAPSED_TIME:
+# 			g_print_event_2 &= (~LCD_ELAPSED_TIME)
+# 			displayElapsed(g_print_elapsed_time)
 
 		while_count += 1
 		if (while_count > period):
