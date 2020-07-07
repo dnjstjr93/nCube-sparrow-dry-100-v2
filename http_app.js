@@ -1521,7 +1521,7 @@ function heat_watchdog() {
         }
         else {
             set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_ON);
+            set_stirrer(TURN_OFF);
         }
 
         cur_weight = parseFloat(dry_data_block.cur_weight) - parseFloat(dry_data_block.pre_weight)
