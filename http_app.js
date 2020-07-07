@@ -1415,7 +1415,7 @@ function lcd_display_watchdog() {
 
 var debug_mode_state = 'start';
 
-setTimeout(core_watchdog, 2000);
+//setTimeout(core_watchdog, 2000);
 
 setTimeout(mon_input_door, 250);
 setTimeout(mon_output_door, 250);
@@ -1521,7 +1521,7 @@ function heat_watchdog() {
         }
         else {
             set_heater(TURN_OFF, TURN_OFF, TURN_OFF);
-            set_stirrer(TURN_OFF);
+            set_stirrer(TURN_ON);
         }
 
         cur_weight = parseFloat(dry_data_block.cur_weight) - parseFloat(dry_data_block.pre_weight)
@@ -1936,7 +1936,7 @@ function crusher() {
 
 var targeting_tick_count = 0;
 var cur_weight = 0.0;
-function core_watchdog() {
+/*function core_watchdog() {
     //console.log(dry_data_block.debug_mode);
     //console.log(dry_data_block.state);
     if(dry_data_block.state == 'INIT') {
@@ -2719,7 +2719,7 @@ function core_watchdog() {
     }
 
     //console.log('core watchdog');
-}
+}*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
