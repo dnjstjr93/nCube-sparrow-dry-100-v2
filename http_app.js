@@ -625,7 +625,7 @@ dry_data_block.ref_external_temp = 280.0;
 dry_data_block.ref_elapsed_time = 5.0;
 dry_data_block.internal_temp = 0.0;
 dry_data_block.external_temp = 0.0;
-dry_data_block.cur_weight = 0.0;
+dry_data_block.cur_weight = -0.1;
 dry_data_block.ref_weight = 0.0;
 dry_data_block.pre_weight = 0.0;
 dry_data_block.tar_weight1 = 0.0;
@@ -1628,7 +1628,7 @@ function do_before_input() {
     pre_elapsed_time = -1;
     pre_cur_weight = 9999;
 
-    dry_data_block.cur_weight = 0.0;
+    dry_data_block.cur_weight = -0.1;
     dry_data_block.ref_weight = 0.0;
     dry_data_block.pre_weight = 0.0;
     dry_data_block.tar_weight1 = 0.0;
