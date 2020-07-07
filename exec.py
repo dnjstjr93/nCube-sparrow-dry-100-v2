@@ -233,6 +233,7 @@ def init_loadcell(referenceUnit = 1):
 
 
 def set_factor(referenceUnit):
+	print('set_factor: ', referenceUnit)
 	init_loadcell(referenceUnit)
 
 def get_loadcell():
