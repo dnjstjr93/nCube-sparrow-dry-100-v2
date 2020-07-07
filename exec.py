@@ -410,7 +410,6 @@ def buzzer(val):
 	freq = [1936, 2094, 1760]#[988, 1047, 880]
 
 	try:
-		# print(Buzzer_pin)
 		p = GPIO.PWM(Buzzer_pin, 600)
 		p.start(50)
 
@@ -589,7 +588,6 @@ def displayInputDoor(msg1):
 
 
 def displayOutputDoor(msg1):
-	print(msg1)
 	if (len(str(msg1)) > 1):
 		msg1 = str(msg1)
 		msg1 = msg1[0:1]
@@ -682,16 +680,16 @@ def on_connect(client,userdata,flags, rc):
 	dry_client.subscribe("/set_lift")
 	dry_client.subscribe("/set_crusher")
 	dry_client.subscribe("/set_cleaning_pump")
-	dry_client.subscribe("/set_buzzer")
-	dry_client.subscribe("/print_lcd_internal_temp")
-	dry_client.subscribe("/print_lcd_state")
-	dry_client.subscribe("/print_lcd_debug_message")
-	dry_client.subscribe("/print_lcd_loadcell")
-	dry_client.subscribe("/print_lcd_loadcell_factor")
-	dry_client.subscribe("/print_lcd_elapsed_time")
-	dry_client.subscribe("/print_lcd_input_door")
-	dry_client.subscribe("/print_lcd_output_door")
-	dry_client.subscribe("/print_lcd_safe_door")
+	#dry_client.subscribe("/set_buzzer")
+	#dry_client.subscribe("/print_lcd_internal_temp")
+	#dry_client.subscribe("/print_lcd_state")
+	#dry_client.subscribe("/print_lcd_debug_message")
+	#dry_client.subscribe("/print_lcd_loadcell")
+	#dry_client.subscribe("/print_lcd_loadcell_factor")
+	#dry_client.subscribe("/print_lcd_elapsed_time")
+	#dry_client.subscribe("/print_lcd_input_door")
+	#dry_client.subscribe("/print_lcd_output_door")
+	#dry_client.subscribe("/print_lcd_safe_door")
 
 def on_disconnect(client, userdata, flags, rc=0):
 	print(str(rc))
@@ -859,6 +857,17 @@ dry_client.on_disconnect = on_disconnect
 dry_client.on_subscribe = on_subscribe
 dry_client.on_message = on_message
 dry_client.connect(broker_address, port)
+
+dry_client.subscribe("/set_buzzer")
+dry_client.subscribe("/print_lcd_internal_temp")
+dry_client.subscribe("/print_lcd_state")
+dry_client.subscribe("/print_lcd_debug_message")
+dry_client.subscribe("/print_lcd_loadcell")
+dry_client.subscribe("/print_lcd_loadcell_factor")
+dry_client.subscribe("/print_lcd_elapsed_time")
+dry_client.subscribe("/print_lcd_input_door")
+dry_client.subscribe("/print_lcd_output_door")
+dry_client.subscribe("/print_lcd_safe_door")
 
 dry_client.loop_start()
 
