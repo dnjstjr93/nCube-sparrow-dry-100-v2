@@ -17,13 +17,17 @@ g_res_zero_point = {}
 g_res_calc_factor = {}
 g_set_zero_point = 0.0
 
+'''
+heater temperature = top_temp = internal_temp
+stirrer temperature = bottom_temp = external_temp
+'''
 avg_bottom_temp = 0.0
 avg_top_temp = 0.0
 bottom_temp_arr = [0,0,0,0,0]
 top_temp_arr = [0,0,0,0,0]
 
 hx = 0
-nWeightCount = 1
+#nWeightCount = 1
 arr_count = 5
 weight_arr = [0, 0, 0, 0, 0]
 flag = 0
@@ -81,6 +85,10 @@ sensor2 = MAX6675.MAX6675(CLK2, CS2, SO2)
 
 #---GET Temperature-----------------------------------------------------
 def get_temp():
+	'''
+	heater temperature = top_temp = internal_temp
+	stirrer temperature = bottom_temp = external_temp
+	'''
 	global avg_bottom_temp, avg_top_temp
 	global arr_count
 	global bottom_temp_arr, top_temp_arr
@@ -159,15 +167,17 @@ def get_loadcell():
 
 	except (KeyboardInterrupt, SystemExit):
 		cleanAndExit()
+		set_factor(get_factor)
 
 	return (weight_json)
 
-'''
-When the factor is 1 and the reference weight is removed, only the case 
-weight is measured.
-variable : zero_weight
-'''
 def ref_weight(tare_weight):
+	'''
+	When the factor is 1 and the reference weight is removed, only the case
+	weight is measured.
+	variable : zero_weight
+	'''
+
 	global hx
 	global zero_weight
 
@@ -186,20 +196,21 @@ def ref_weight(tare_weight):
 
 	return val
 
-'''
-Measures to the reference weight + case weight when factor is 1.
-(Variable : ref_weight_total)
-
-Calculate the weight of the reference weight minus the case weight and 
-divide by the reference weight to get the factor.
-(Variable : get_factor)
-
-Apply get_factor to get the weight and subtract the reference weight to
-calculate correlation value.
-correlation value is a variable for precisely calculating the weight.
-(Variable : get_correlation_value)
-'''
 def calc_ref_Unit(reference_weight, default_Unit=1):
+	'''
+	Measures to the reference weight + case weight when factor is 1.
+	(Variable : ref_weight_total)
+
+	Calculate the weight of the reference weight minus the case weight and
+	divide by the reference weight to get the factor.
+	(Variable : get_factor)
+
+	Apply get_factor to get the weight and subtract the reference weight to
+	calculate correlation value.
+	correlation value is a variable for precisely calculating the weight.
+	(Variable : get_correlation_value)
+	'''
+
 	global hx
 	global get_correlation_value
 	global zero_weight
