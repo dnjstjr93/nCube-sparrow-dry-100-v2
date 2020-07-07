@@ -259,7 +259,11 @@ def get_loadcell():
 		avg_weight = round((sum(weight_arr) / arr_count), 1)
 		final_weight = avg_weight - get_correlation_value
 		final_weight = max(0, float(final_weight))
-
+		print("GET : weight_arr: ",weight_arr)
+		print("GET : avg_weight: ",avg_weight)
+		print("GET : get_factor: ",get_factor)
+		print("GET : get_correlation_value: ",get_correlation_value)
+		print("GET : final_weight: ",final_weight)
 		weight_json = val_to_json(final_weight)
 
 	except (KeyboardInterrupt, SystemExit):
@@ -311,8 +315,11 @@ def calc_ref_Unit(reference_weight, default_Unit=1):
 
 	ref_weight_total = hx.get_weight(5)
 
+	print('calc_ref_Unit : avg_ref_weight: ', ref_weight_total)
 	cur_weight = (ref_weight_total - zero_weight)
 	get_factor = (cur_weight / reference_weight)
+	print('calc_ref_Unit : cur_weight = {} - {} = {}'.format(ref_weight_total, zero_weight, cur_weight))
+	print('calc_ref_Unit : get_factor = {} / {} = {}'.format(cur_weight, reference_weight, get_factor))
 
 	if (abs(get_factor) < 1.0):
 		get_factor = default_Unit
@@ -324,6 +331,8 @@ def calc_ref_Unit(reference_weight, default_Unit=1):
 
 	get_correlation_value = factor_weight_total - reference_weight
 	factor = {"factor":get_factor, "correlation_value":get_correlation_value}
+	print('calc_ref_Unit : avg_factor_weight: ', factor_weight_total)
+	print('calc_ref_Unit : correlation_value: ', get_correlation_value)
 	with open ("./factor.json", "w") as factor_json:
 		json.dump(factor, factor_json)
 
