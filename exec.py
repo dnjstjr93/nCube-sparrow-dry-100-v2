@@ -175,6 +175,12 @@ SCL = 16 # SCL_LCD-CLK
 addr = 0x3e
 sx = SX1509.SX1509(addr)
 ctl = Control.Control(sx)
+
+# Buzzer
+Buzzer_pin = 11 # Direct Connect
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(Buzzer_pin, GPIO.OUT)
 #=======================================================================
 
 #---GET Temperature-----------------------------------------------------
@@ -714,24 +720,24 @@ def on_message(client, userdata, _msg):
     global g_set_lift_val
     global g_set_crusher_val
     global g_set_cleaning_pump_val
+    
+    global g_buzzer_event
+    global g_set_buzzer_val
 
-	global g_buzzer_event
-	global g_set_buzzer_val
-
-	global g_print_event
-	global g_print_event_2
-	global g_print_debug
-	global g_print_input_door
-	global g_print_output_door
-	global g_print_safe_door
-	global g_print_internal_temp
-	global g_print_external_temp
-	global g_print_state
-	global g_print_loadcell
-	global g_print_target_loadcell
-	global g_print_loadcell_factor
-	global g_print_corr_val
-	global g_print_elapsed_time
+    global g_print_event
+    global g_print_event_2
+    global g_print_debug
+    global g_print_input_door
+    global g_print_output_door
+    global g_print_safe_door
+    global g_print_internal_temp
+    global g_print_external_temp
+    global g_print_state
+    global g_print_loadcell
+    global g_print_target_loadcell
+    global g_print_loadcell_factor
+    global g_print_corr_val
+    global g_print_elapsed_time
 
     correlation_value = loadcell_corr_val
 
@@ -786,59 +792,59 @@ def on_message(client, userdata, _msg):
         g_set_event |= SET_CLEANING_PUMP
 
 
-	if _msg.topic == '/set_buzzer':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_set_buzzer_val = json_to_val(data)
-		g_buzzer_event |= SET_BUZZER
+    if _msg.topic == '/set_buzzer':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_set_buzzer_val = json_to_val(data)
+        g_buzzer_event |= SET_BUZZER
 
 
-	if _msg.topic == '/print_lcd_debug_message':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_debug = json_to_val(data)
-		g_print_event |= LCD_DEBUG
+    if _msg.topic == '/print_lcd_debug_message':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_debug = json_to_val(data)
+        g_print_event |= LCD_DEBUG
 
-	elif _msg.topic == '/print_lcd_input_door':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_input_door = json_to_val(data)
-		g_print_event |= LCD_INPUT_DOOR
+    elif _msg.topic == '/print_lcd_input_door':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_input_door = json_to_val(data)
+        g_print_event |= LCD_INPUT_DOOR
 
-	elif _msg.topic == '/print_lcd_output_door':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_output_door = json_to_val(data)
-		g_print_event |= LCD_OUTPUT_DOOR
+    elif _msg.topic == '/print_lcd_output_door':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_output_door = json_to_val(data)
+        g_print_event |= LCD_OUTPUT_DOOR
 
-	elif _msg.topic == '/print_lcd_safe_door':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_safe_door = json_to_val(data)
-		g_print_event |= LCD_SAFE_DOOR
+    elif _msg.topic == '/print_lcd_safe_door':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_safe_door = json_to_val(data)
+        g_print_event |= LCD_SAFE_DOOR
 
-	elif _msg.topic == '/print_lcd_internal_temp':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_internal_temp, g_print_external_temp = json_to_val(data)
-		g_print_event |= LCD_TEMPERATURE
+    elif _msg.topic == '/print_lcd_internal_temp':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_internal_temp, g_print_external_temp = json_to_val(data)
+        g_print_event |= LCD_TEMPERATURE
 
-	elif _msg.topic == '/print_lcd_state':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_state = json_to_val(data)
-		g_print_event |= LCD_STATE
+    elif _msg.topic == '/print_lcd_state':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_state = json_to_val(data)
+        g_print_event |= LCD_STATE
 
-	elif _msg.topic == '/print_lcd_loadcell':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		loadcell, target_loadcell = json_to_val(data)
-		g_print_loadcell = str(loadcell)
-		g_print_target_loadcell = str(target_loadcell)
-		g_print_event |= LCD_LOADCELL
+    elif _msg.topic == '/print_lcd_loadcell':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        loadcell, target_loadcell = json_to_val(data)
+        g_print_loadcell = str(loadcell)
+        g_print_target_loadcell = str(target_loadcell)
+        g_print_event |= LCD_LOADCELL
 
-	elif _msg.topic == '/print_lcd_loadcell_factor':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		g_print_loadcell_factor, g_print_corr_val = json_to_val(data)
-		g_print_event |= LCD_LOADCELL_FACTOR
+    elif _msg.topic == '/print_lcd_loadcell_factor':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        g_print_loadcell_factor, g_print_corr_val = json_to_val(data)
+        g_print_event |= LCD_LOADCELL_FACTOR
 
-	elif _msg.topic == '/print_lcd_elapsed_time':
-		data = _msg.payload.decode('utf-8').replace("'", '"')
-		elapsed_time = json_to_val(data)
-		g_print_elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
-		g_print_event_2 |= LCD_ELAPSED_TIME
+    elif _msg.topic == '/print_lcd_elapsed_time':
+        data = _msg.payload.decode('utf-8').replace("'", '"')
+        elapsed_time = json_to_val(data)
+        g_print_elapsed_time = str(datetime.timedelta(seconds=elapsed_time))
+        g_print_event_2 |= LCD_ELAPSED_TIME
 
 #-----------------------------------------------------------------------
 

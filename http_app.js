@@ -1488,7 +1488,7 @@ function heat_watchdog() {
 
             debug_mode_state = 'start_waiting';
 
-            setTimeout(core_watchdog, normal_interval);
+            //setTimeout(core_watchdog, normal_interval);
         }
         else if (debug_mode_state == 'put_on') {
             dry_data_block.debug_message = 'Put weight on - ' + dry_data_block.loadcell_ref_weight;
@@ -1496,7 +1496,7 @@ function heat_watchdog() {
 
             debug_mode_state = 'put_on_waiting';
 
-            setTimeout(core_watchdog, normal_interval);
+            //setTimeout(core_watchdog, normal_interval);
         }
         else if (debug_mode_state == 'complete') {
             dry_data_block.debug_message = 'Complete zero point';
