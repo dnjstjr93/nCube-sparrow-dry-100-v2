@@ -874,8 +874,8 @@ dry_client.loop_start()
 loadcell_factor, loadcell_corr_val = save_factor()
 init_loadcell(loadcell_factor)
 
-global g_lcd
-g_lcd = lcd_init()
+# global g_lcd
+# g_lcd = lcd_init()
 
 def core_func():
 	period = 20000
