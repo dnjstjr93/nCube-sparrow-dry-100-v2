@@ -57,9 +57,9 @@ $ node -v
 
 $ sudo npm install -g pm2
 
-$ git clone https://github.com/IoTKETI/nCube-sparrow-dry-100
+$ git clone https://github.com/IoTKETI/nCube-sparrow-dry-100-v2
 
-$ cd /home/pi/nCube-sparrow-dry-100
+$ cd /home/pi/nCube-sparrow-dry-100-v2
 
 $ npm install
 ```
@@ -70,5 +70,5 @@ $ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 ```
 ```
 # Add start command
-sh /home/pi/nCube-sparrow-dry-100/auto-food.sh
+sh /home/pi/nCube-sparrow-dry-100-v2/auto-food.sh
 ```
